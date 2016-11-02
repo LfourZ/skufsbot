@@ -1,14 +1,25 @@
 {
   "data":{
-    "msgsettings":"0",
+    "silentchar":"/",
     "loudchar":"!",
-    "leavemsg":"User has left the server",
+    "joinmsg":"**Welcome USERMENTION to the server!**",
     "msgchannel":"212548102660423681",
-    "joinmsg":"User has joined the server",
+    "msgsettings":1,
     "servername":"SKUFS.net",
-    "silentchar":"/"
+    "leavemsg":"User has left the server"
   },
   "commands":{
+    "playerlist":{
+      "channels":{
+        "none":true
+      },
+      "roles":{
+        "none":true
+      },
+      "users":{
+        "184262286058323968":true
+      }
+    },
     "printelement":{
       "channels":{
         "none":true
@@ -17,6 +28,19 @@
         "none":true
       },
       "users":{
+        "124243691123638274":true,
+        "184262286058323968":true
+      }
+    },
+    "setdata":{
+      "channels":{
+        "none":true
+      },
+      "roles":{
+        "none":true
+      },
+      "users":{
+        "124243691123638274":true,
         "184262286058323968":true
       }
     },
@@ -28,10 +52,11 @@
         "none":true
       },
       "users":{
+        "124243691123638274":true,
         "184262286058323968":true
       }
     },
-    "whocanuse":{
+    "test123":{
       "channels":{
         "none":true
       },
@@ -53,7 +78,7 @@
         "184262286058323968":true
       }
     },
-    "playerlist":{
+    "whocanuse":{
       "channels":{
         "none":true
       },
@@ -61,6 +86,7 @@
         "none":true
       },
       "users":{
+        "124243691123638274":true,
         "184262286058323968":true
       }
     }

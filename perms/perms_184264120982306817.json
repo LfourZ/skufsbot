@@ -2,14 +2,36 @@
   "data":{
     "silentchar":"/",
     "loudchar":"!",
-    "joinmsg":"User has joined the server",
+    "joinmsg":"Welcome USERMENTION to this hellhole.NEWLINEOr don'tNEWLINEYou probably wouldn't anyway",
     "msgchannel":"184264120982306817",
-    "msgsettings":"0",
+    "msgsettings":3,
     "servername":"Honest Men",
-    "leavemsg":"User has left the server"
+    "leavemsg":"USERNAME has left the server. I guess that the cancer got to him"
   },
   "commands":{
+    "playerlist":{
+      "channels":{
+        "none":true
+      },
+      "roles":{
+        "none":true
+      },
+      "users":{
+        "184262286058323968":true
+      }
+    },
     "printelement":{
+      "channels":{
+        "none":true
+      },
+      "roles":{
+        "none":true
+      },
+      "users":{
+        "184262286058323968":true
+      }
+    },
+    "setdata":{
       "channels":{
         "none":true
       },
@@ -31,7 +53,7 @@
         "184262286058323968":true
       }
     },
-    "playerlist":{
+    "test123":{
       "channels":{
         "none":true
       },
@@ -44,12 +66,10 @@
     },
     "test":{
       "channels":{
-        "none":true,
-        "184264120982306817":false
+        "none":true
       },
       "roles":{
-        "none":true,
-        "184295756163710976":true
+        "none":true
       },
       "users":{
         "184262286058323968":true
