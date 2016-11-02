@@ -34,8 +34,7 @@ client:on("messageCreate", function(message)
 				end
 				-------
 				if cmd == "permission" then
-					local testy = perm.editPerms(message.mentions, larg, message.server)
-					message.channel:sendMessage(testy)
+					message.channel:sendMessage(perm.editPerms(message.mentions, larg, message.server))
 				end
 				-------
 				if cmd == "whocanuse" then
@@ -47,7 +46,12 @@ client:on("messageCreate", function(message)
 					message.channel:sendMessage(perm.printElement(arg, message))
 				end
 				-------
-
+				if cmd == "setdata" then
+					if arg == nil then return end
+					perm.setData(arg, message)
+				end
+				-------
+				
 				--Put commands here
 
 				
@@ -57,6 +61,15 @@ client:on("messageCreate", function(message)
 			end
 		end
 	end
+end)
+
+client:on("memberJoin", function(member)
+	perm.announcement("join", member)
+end)
+
+
+client:on("memberLeave", function(member)
+	perm.announcement("leave", member)
 end)
 
 client:run(_G.SKUFS_TOKEN)
