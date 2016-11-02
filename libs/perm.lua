@@ -19,16 +19,44 @@ _G.perms.servers = {}
 _G.defcommands = {}
 
 --These commands are added to any server with the above root role/user/channels
-_G.defcommands["playerlist"] = {}
-_G.defcommands["test"] = {}
-_G.defcommands["permission"] = {}
-_G.defcommands["whocanuse"] = {}
-_G.defcommands["printelement"] = {}
+_G.defcommands["test"] = {info = "A test command.", usage = "!test"}
+_G.defcommands["permission"] = {info = "Used to add, remove or clear permissions", usage = "!permission <add/remove/clear> <command name> <mentions (@user, @role, #channel)>\nAdding an user gives the user complete authority, even if their channel and role are blacklisted.\nSimilarly, blacklisting a user bans them entirely from using the command.\nFor a user to use a command, their role must allow it, and the channel must too.\n(if no specific rule is applied to the channel, it defaults to allowing the command)"}
+_G.defcommands["whocanuse"] = {info = "Tells you who can use specified command", usage = "!whocanuse <command name>"}
+_G.defcommands["printelement"] = {info = "Prints specified element of permissions table", usage = "!printelement <path to element, layers seperated by whitespaces>\nYou can use Server.id and Me.id as placeholders for your id and the server's id"}
+_G.defcommands["setdata"] = {info = "Sets any value in servers/serverID/data", usage = "!setdata <element> <value>\nYou can see the editable elements by running !printelement perms servers Server.id data\nWhile I was writing this, I noticed a bug: DON'T EDIT NUMBERS. Thanks"}
+
+_G.events = {}
+_G.events["join"] = bit.arshift(1, 0)
+_G.events["leave"] = bit.arshift(1, -1)
 
 local function ldebug(String)
 	if not DEBUG then return end
 	print(string.format("[%s]: %s", os.date("%c"), String))
 end
+
+local function announcement(Event, Member)
+	local str = ""
+	if Event == "join" then
+		if bit.band(_G.perms.servers[Member.server.id].data.msgsettings, _G.events.join) ~= 0 then
+			str = _G.perms.servers[Member.server.id].data.joinmsg
+			str = string.gsub(str, "USERNAME", Member.name)
+			str = string.gsub(str, "USERID", Member.id)
+			str = string.gsub(str, "USERMENTION", Member:getMentionString())
+			str = string.gsub(str, "NEWLINE", "\n")
+		end
+	elseif Event == "leave" then
+		if bit.band(_G.perms.servers[Member.server.id].data.msgsettings, _G.events.leave) ~= 0 then
+			str = _G.perms.servers[Member.server.id].data.joinmsg
+			str = string.gsub(str, "USERNAME", Member.name)
+			str = string.gsub(str, "USERID", Member.id)
+			str = string.gsub(str, "USERMENTION", Member:getMentionString())
+			str = string.gsub(str, "NEWLINE", "\n")
+		end
+	end
+	if str == "" then return end
+	Member.server:getChannelById(_G.perms.servers[Member.server.id].data.msgchannel):sendMessage(str)
+end
+M.announcement = announcement
 
 --Prints data found in path Message seperated by whitespaces.
 local function printElement(String, Message)
@@ -58,17 +86,6 @@ local function printElement(String, Message)
 end
 M.printElement = printElement
 
-local function setData(String, Message)
-	local str = string.gsub(String, "Server.id", Message.server.id)
-	str = string.gsub(str, "Me.id", Message.author.id)
-	local value, key = string.match(str, "(%S+) (%S+)")
-	if key == nil then return end
-
-	_G.servers[Message.server.id].data[key] = value
-end
-M.setData = setData
-
-
 --Initial test to use JSON
 local function savePermFile(Server)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
@@ -78,6 +95,18 @@ local function savePermFile(Server)
 	io.close(file)
 end
 M.savePermFile = savePermFile
+
+local function setData(String, Message)
+	local str = string.gsub(String, "Server.id", Message.server.id)
+	str = string.gsub(str, "Me.id", Message.author.id)
+	local key, value = string.match(str, "(%S+) (.*)")
+	if key == nil then return end
+
+	_G.perms.servers[Message.server.id].data[key] = value
+	savePermFile(Message.server)
+end
+M.setData = setData
+
 
 --Checks if Char is one of the server's silent or loud character. This determines whether the command gets deleted
 local function isSilent(Char, Server)
@@ -130,7 +159,7 @@ local function generatePermTable(Server, Table) --I DUNNO
 	tbl.data["joinmsg"] = "User has joined the server"
 	tbl.data["leavemsg"] = "User has left the server"
 	tbl.data["msgchannel"] = Server.defaultChannel.id
-	tbl.data["msgsettings"] = "0"
+	tbl.data["msgsettings"] = 3
 	tbl["commands"] = {}
 	for k, v in pairs(Table) do
 		tbl.commands[k] = {}
