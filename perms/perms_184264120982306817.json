@@ -1,12 +1,12 @@
 {
   "data":{
-    "msgsettings":"0",
+    "silentchar":"/",
     "loudchar":"!",
-    "leavemsg":"User has left the server",
-    "msgchannel":"184264120982306817",
     "joinmsg":"User has joined the server",
+    "msgchannel":"184264120982306817",
+    "msgsettings":"0",
     "servername":"Honest Men",
-    "silentchar":"/"
+    "leavemsg":"User has left the server"
   },
   "commands":{
     "printelement":{
@@ -31,7 +31,7 @@
         "184262286058323968":true
       }
     },
-    "whocanuse":{
+    "playerlist":{
       "channels":{
         "none":true
       },
@@ -47,13 +47,14 @@
         "none":true
       },
       "roles":{
-        "none":true
+        "none":true,
+        "184295756163710976":"true"
       },
       "users":{
         "184262286058323968":true
       }
     },
-    "playerlist":{
+    "whocanuse":{
       "channels":{
         "none":true
       },

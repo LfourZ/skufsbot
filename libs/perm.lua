@@ -208,18 +208,17 @@ M.isPermsLoaded = isPermsLoaded
 --returns true or false (if found), and breaks. If values don't match, goes back to beginning. If nothing is found,
 --return defaults to Bool
 local function crossCheckKey(Table, Table2, Bool, Server)
-	ldebug("Running function "..debug.getinfo(1, "n").name)
 	local found = false
 	local result = Bool
 	for k, v in pairs(Table) do
 		if found then break end
 		for kr, vr in pairs(Table2) do
 			if kr == k then
-				if vr == "true" then
+				if vr == true then
 					found = true
 					result = true
 					break
-				elseif vr == "false" then
+				elseif vr == false then
 					found = true
 					result = false
 					break
@@ -230,16 +229,12 @@ local function crossCheckKey(Table, Table2, Bool, Server)
 			end
 		end
 	end
-	if Table2[Server.defaultRole.id] == "true" then
+	if Table2[Server.defaultRole.id] == true then
 		result = true
-	elseif Table2[Server.defaultRole.id] == "false" then
+	elseif Table2[Server.defaultRole.id] == false then
 		result = false
 	end
-	if result and DEBUG then
-		print("^ allowed")
-	else
-		print("^ not allowed")
-	end
+	ldebug("Function "..debug.getinfo(1, "n").name.." returned: "..tostring(result))
 	return result
 end
 M.crossCheckKey = crossCheckKey
@@ -305,9 +300,9 @@ local function editPerms(Table, Args, Server)
 	local str = "```\n"
 	str = str.."Action "..action.." applied to command "..commande.." with members:\n"
 	if action == "add" then
-		action = "true"
+		action = true
 	elseif action == "remove" then
-		action = "false"
+		action = false
 	elseif action == "clear" then
 		action = nil
 	end
@@ -340,9 +335,8 @@ local function whoCanUse(Command, Server, Client)
 	str = str.."Members who can/cannot use command "..Command..":\n"
 	if type(_G.perms.servers[Server.id].commands[Command].users) == "table" then
 		for k, v in pairs(_G.perms.servers[Server.id].commands[Command].users) do
-			if v ~= "true" and v ~= "false" then
-				print("hi")
-			elseif v == "true" then
+			if v ~= true and v ~= false then
+			elseif v == true then
 				allowed = "is allowed"
 			else
 				allowed = "is not allowed"
@@ -357,9 +351,8 @@ local function whoCanUse(Command, Server, Client)
 	str = str.."Channels that can/cannot use command "..Command..":\n"
 	if type(_G.perms.servers[Server.id].commands[Command].channels) == "table" then
 		for k, v in pairs(_G.perms.servers[Server.id].commands[Command].channels) do
-			if v ~= "true" and v ~= "false" then
-				print("hi")
-			elseif v == "true" then
+			if v ~= true and v ~= false then
+			elseif v == true then
 				allowed = "is allowed"
 			else
 				allowed = "is not allowed"
@@ -374,9 +367,8 @@ local function whoCanUse(Command, Server, Client)
 	str = str.."Roles that can/cannot use command "..Command..":\n"
 	if type(_G.perms.servers[Server.id].commands[Command].roles) == "table" then
 		for k, v in pairs(_G.perms.servers[Server.id].commands[Command].roles) do
-			if v ~= "true" and v ~= "false" then
-				print("hi")
-			elseif v == "true" then
+			if v ~= true and v ~= false then
+			elseif v == true then
 				allowed = "is allowed"
 			else
 				allowed = "is not allowed"
