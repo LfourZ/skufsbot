@@ -41,7 +41,12 @@ client:on("messageCreate", function(message)
 				if cmd == "whocanuse" then
 					message.channel:sendMessage(perm.whoCanUse(larg, message.server, client))
 				end
-
+				-------
+				if cmd == "printelement" then
+					if arg == nil then return end
+					message.channel:sendMessage(perm.printElement(arg, message))
+				end
+				-------
 
 				--Put commands here
 

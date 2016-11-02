@@ -18,6 +18,33 @@ _G.defcommands["playerlist"] = {}
 _G.defcommands["test"] = {}
 _G.defcommands["permission"] = {}
 _G.defcommands["whocanuse"] = {}
+_G.defcommands["editelement"] = {}
+_G.defcommands["printelement"] = {}
+
+--Prints data found in path Message seperated by whitespaces.
+local function printElement(String, Message)
+	local str = string.gsub(String, "Server.id", Message.server.id)
+	str = string.gsub(str, "Me.id", Message.author.id)
+	local path = _G
+	local returnstr = "```\n"
+	for i in string.gmatch(str, "%S+") do
+		path = path[i]
+	end
+	if type(path) == "string" then
+		returnstr = returnstr..path
+	elseif type(path) == "table" then
+		for k, v in pairs(path) do
+			returnstr = returnstr..k.."\n"
+		end
+	else
+		returnstr = returnstr.."Path was type "..type(path)
+	end
+	returnstr = returnstr.."```"
+	return returnstr
+end
+M.printElement = printElement
+
+
 
 --A few requires
 local xml = require("./tableToXml") --For table to xml
@@ -27,7 +54,7 @@ local httpfunctions = require("./httpFunctions") --For http functions and xml to
 --
 local function ldebug(String)
 	if not DEBUG then return end
-	print(string.format("[%s]: %s"), os.date("%c"), String)
+	print(string.format("[%s]: %s", os.date("%c"), String))
 end
 
 --Checks if Char is one of the server's silent or loud character. This determines whether the command gets deleted
@@ -89,13 +116,16 @@ M.savePermFile = savePermFile
 --Creates table structure and default entries for a server, used for instance when new server is detected
 local function generatePermTable(Server, Table) --I DUNNO
 	if DEBUG then print(debug.getinfo (1, "n").name) end
-	local allrole = Server.de
 	local tbl = {}
 	tbl["data"] = {}
-	tbl["commands"] = {}
 	tbl.data["silentchar"] = "/"
 	tbl.data["loudchar"] = "!"
 	tbl.data["servername"] = Server.name
+	tbl.data["joinmsg"] = "User has joined the server"
+	tbl.data["leavemsg"] = "User has left the server"
+	tbl.data["msgchannel"] = Server.defaultChannel
+	tbl.data["msgsettings"] = "0"
+	tbl["commands"] = {}
 	for k, v in pairs(Table) do
 		tbl.commands[k] = {}
 		tbl.commands[k].roles =  {}
