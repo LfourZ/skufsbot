@@ -44,11 +44,12 @@
     },
     "test":{
       "channels":{
-        "none":true
+        "none":true,
+        "184264120982306817":false
       },
       "roles":{
         "none":true,
-        "184295756163710976":"true"
+        "184295756163710976":true
       },
       "users":{
         "184262286058323968":true

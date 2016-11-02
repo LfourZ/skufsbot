@@ -37,7 +37,12 @@ local function printElement(String, Message)
 	local path = _G
 	local returnstr = "```\n"
 	for i in string.gmatch(str, "%S+") do
-		path = path[i]
+		if type(path[i]) ~= "nil" then
+			path = path[i]
+		else
+			path = "Something went wrong; tried to index nil"
+			break
+		end
 	end
 	if type(path) == "string" then
 		returnstr = returnstr..path
@@ -52,6 +57,17 @@ local function printElement(String, Message)
 	return returnstr
 end
 M.printElement = printElement
+
+local function setData(String, Message)
+	local str = string.gsub(String, "Server.id", Message.server.id)
+	str = string.gsub(str, "Me.id", Message.author.id)
+	local value, key = string.match(str, "(%S+) (%S+)")
+	if key == nil then return end
+
+	_G.servers[Message.server.id].data[key] = value
+end
+M.setData = setData
+
 
 --Initial test to use JSON
 local function savePermFile(Server)
@@ -167,16 +183,18 @@ M.loadPermFile = loadPermFile
 --Checks if Command exists on Server. If not, checks if Command is a default command, and if so, loads it
 local function commandExists(Command, Server)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-	if _G.perms.servers[Server.id].commands[Command] ~= nil then
-		return true
+	local returnval = false
+	if type(_G.perms.servers[Server.id].commands[Command]) ~= "nil" then
+		returnval = true
 	else
-		if _G.defcommands[Command] ~= nil then
+		if type(_G.defcommands[Command]) ~= "nil" then
 			addCommand(Command, Server)
-			return true
+			returnval = true
 		else
-			return false
+			returnval = false
 		end
 	end
+	return returnval
 end
 M.commandExists = commandExists
 
