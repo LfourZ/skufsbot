@@ -1,0 +1,5 @@
+-Make so that permissions for servers/roles/members always gets a default value, and root ids only get added when existant.
+-Make so that server owner gets root
+-Change all instances of user to member
+-Add command to get usage and info for commands
+-Add command to list all commands (Permission specific?)
