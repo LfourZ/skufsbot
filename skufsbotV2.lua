@@ -15,15 +15,12 @@ client:on("messageCreate", function(message)
 	local cmd, arg = string.match(message.content, "(%S+) (.*)")
 	cmd = cmd or message.content
 	local larg = nil
-	if arg ~= nil then
+	if type(arg) == "string" then
 		larg = string.lower(arg)
 	end
-
 	local firstChar = string.sub(cmd, 1, 1)
 	local delete = false
 	cmd = string.lower(string.sub(cmd, 2))
-
-
 	if perm.commandExists(cmd, message.server) then
 		if perm.canUse(message, cmd) then
 			if perm.isSilent(firstChar, message.server) ~= nil then
@@ -49,12 +46,25 @@ client:on("messageCreate", function(message)
 				if cmd == "setdata" then
 					if arg == nil then return end
 					perm.setData(arg, message)
+					-------
+				elseif cmd == "info" then
+					if arg == nil then return end
+					message.channel:sendMessage(perm.cmdinfo(arg, message.server))
+					-------
+				elseif cmd == "usage" then
+					if arg == nil then return end
+					message.channel:sendMessage(perm.cmdusage(arg, message.server))
+					-------
+				elseif cmd == "help" then
+					message.channel:sendMessage(perm.cmdhelp(arg, message.server))
+					-------
 				end
-				-------
-				
+
+
+
 				--Put commands here
 
-				
+
 				if delete then
 					message:delete()
 				end
