@@ -1,15 +1,37 @@
 {
   "data":{
-    "msgsettings":3,
+    "silentchar":"/",
     "loudchar":"!",
-    "leavemsg":"User has left the server",
-    "msgchannel":"233195596025036802",
     "joinmsg":"User has joined the server",
+    "msgchannel":"233195596025036802",
+    "msgsettings":3,
     "servername":"The Server For Stale Meymeys",
-    "silentchar":"/"
+    "leavemsg":"User has left the server"
   },
   "commands":{
-    "printelement":{
+    "help":{
+      "channels":{
+        "none":true
+      },
+      "roles":{
+        "none":true
+      },
+      "users":{
+        "184262286058323968":true
+      }
+    },
+    "whocanuse":{
+      "channels":{
+        "none":true
+      },
+      "roles":{
+        "none":true
+      },
+      "users":{
+        "184262286058323968":true
+      }
+    },
+    "info":{
       "channels":{
         "none":true
       },
@@ -42,6 +64,17 @@
         "184262286058323968":true
       }
     },
+    "printelement":{
+      "channels":{
+        "none":true
+      },
+      "roles":{
+        "none":true
+      },
+      "users":{
+        "184262286058323968":true
+      }
+    },
     "test":{
       "channels":{
         "none":true
@@ -53,7 +86,7 @@
         "184262286058323968":true
       }
     },
-    "whocanuse":{
+    "usage":{
       "channels":{
         "none":true
       },
