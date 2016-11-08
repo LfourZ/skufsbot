@@ -19,14 +19,15 @@ _G.perms.servers = {}
 _G.defcommands = {}
 
 --These commands are added to any server with the above root role/user/channels
---TEMPLATE: _G.defcommands[""] = {info = "Nothing here yet!", usage = "Nothing here yet!"}
+--TEMPLATE: _G.defcommands[""] = {info = nil, usage = nil}
 _G.defcommands["test"] = {info = "A test command.", usage = "!test"}
-_G.defcommands["permission"] = {info = "Used to add, remove or clear permissions", usage = "!permission<add/remove/clear> <command name> <mentions (@user, @role, #channel)>\nAdding an user gives the user complete authority, even if their channel and role are blacklisted.\nSimilarly, blacklisting a user bans them entirely from using the command.\nFor a user to use a command, their role must allow it, and the channel must too.\n(if no specific rule is applied to the channel, it defaults to allowing the command)"}
+_G.defcommands["permission"] = {info = "Used to add, remove or clear permissions", usage = "!permission<add/remove/clear> <command name> <mentions (@user, @role, #channel)>\n\nAdding an user gives the user complete authority, even if their channel and role are blacklisted.\nSimilarly, blacklisting a user bans them entirely from using the command.\nFor a user to use a command, their role must allow it, and the channel must too.\n(if no specific rule is applied to the channel, it defaults to allowing the command)"}
 _G.defcommands["whocanuse"] = {info = "Tells you who can use specified command", usage = "!whocanuse <command name>"}
-_G.defcommands["printelement"] = {info = "Prints specified element of permissions table", usage = "!printelement<path to element, layers seperated by whitespaces>\nYou can use Server.id and Me.id as placeholders for your id and the server's id"}
-_G.defcommands["setdata"] = {info = "Sets any value in servers/serverID/data", usage = "!setdata <element> <value>\nYou can see the editable elements by running !printelement perms servers Server.id data\nWhile I was writing this, I noticed a bug: DON'T EDIT NUMBERS. Thanks"}
+_G.defcommands["printelement"] = {info = "Prints specified element of permissions table", usage = "!printelement<path to element, layers seperated by whitespaces>\n\nYou can use Server.id and Me.id as placeholders for your id and the server's id"}
+_G.defcommands["setdata"] = {info = "Sets any value in servers/serverID/data", usage = "!setdata <element> <value>\n\nYou can see the editable elements by running !printelement perms servers Server.id data\nWhile I was writing this, I noticed a bug: DON'T EDIT NUMBERS. Thanks"}
 _G.defcommands["info"] = {info = "Gives brief description of command", usage = "!info <command>"}
 _G.defcommands["usage"] = {info = "Shows usage of command", usage = "!usage <command>"}
+_G.defcommands["help"] = {info = nil, usage = nil}
 
 
 
@@ -215,25 +216,25 @@ end
 M.loadPermFile = loadPermFile
 
 --Checks if Command exists on Server. If not, checks if Command is a default command, and if so, loads it
-local function commandExists(Command, Server)
-	ldebug("Running function "..debug.getinfo(1, "n").name)
+local function commandExists(Cmd, Server)
 	local returnval = false
-	if type(_G.perms.servers[Server.id].commands[Command]) ~= "nil" then
+	if type(_G.perms.servers[Server.id].commands[Cmd]) ~= "nil" then
 		returnval = true
 	else
-		if type(_G.defcommands[Command]) ~= "nil" then
-			addCommand(Command, Server)
+		if type(_G.defcommands[Cmd]) ~= "nil" then
+			addCommand(Cmd, Server)
 			returnval = true
 		else
 			returnval = false
 		end
 	end
+	ldebug("Running function "..debug.getinfo(1, "n").name..":"..tostring(returnval))
 	return returnval
 end
 M.commandExists = commandExists
 
---Checks for permission XML file for ALL servers, when server without file is found, generates server file with default commands
-local function checkForPermFile(Client) --ALSO DONE
+--Checks for permission JSON file for ALL servers, when server without file is found, generates server file with default commands
+local function checkForPermFile(Client)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
 	for k, v in pairs(Client.servers) do
 		if not fileExists("./perms/perms_"..v.id..".json") then
@@ -440,11 +441,49 @@ local function whoCanUse(Command, Server, Client)
 end
 M.whoCanUse = whoCanUse
 
-local function Server:cmdinfo(Cmd)
-	local returnval = ""
-	if not commandExists(Cmd, self) then
+local function cmdinfo(Cmd, Server)
+	local returnval = "```\n"
+	if not commandExists(Cmd, Server) then
 		returnval = nil
+	elseif type(_G.defcommands[Cmd].info) ~= "string" then
+		returnval = returnval.."This command has no info attached to it yet"
 	else
-		returnval = _G.perms.s
-		----INCOMPLETE PLEASE DON'T FORGET
+		returnval = returnval.._G.defcommands[Cmd].info
+	end
+	returnval = returnval.."```"
+	return returnval
+end
+M.cmdinfo = cmdinfo
+
+local function cmdusage(Cmd, Server)
+	local returnval = "```\n"
+	if not commandExists(Cmd, Server) then
+		returnval = nil
+	elseif type(_G.defcommands[Cmd].usage) ~= "string" then
+		returnval = returnval.."This command has no usage info attached to it yet"
+	else
+		returnval = returnval.._G.defcommands[Cmd].usage
+	end
+	returnval = returnval.."```"
+	return returnval
+end
+M.cmdusage = cmdusage
+
+local function cmdhelp(Cmd, Server)
+	local returnval = ""
+	if Cmd == nil then
+		returnval = "```Commandlist not yet implemented```"
+	else
+		if not commandExists(Cmd, Server) then
+			returnval = "```\nCommand '"..Cmd.."' doesn't exist.\n```"
+		else
+			returnval = returnval..cmdinfo(Cmd, Server).."\n"
+			returnval = returnval..cmdusage(Cmd, Server)
+		end
+	end
+	return returnval
+end
+M.cmdhelp = cmdhelp
+
+
 return M
