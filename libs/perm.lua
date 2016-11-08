@@ -19,11 +19,16 @@ _G.perms.servers = {}
 _G.defcommands = {}
 
 --These commands are added to any server with the above root role/user/channels
+--TEMPLATE: _G.defcommands[""] = {info = "Nothing here yet!", usage = "Nothing here yet!"}
 _G.defcommands["test"] = {info = "A test command.", usage = "!test"}
-_G.defcommands["permission"] = {info = "Used to add, remove or clear permissions", usage = "!permission <add/remove/clear> <command name> <mentions (@user, @role, #channel)>\nAdding an user gives the user complete authority, even if their channel and role are blacklisted.\nSimilarly, blacklisting a user bans them entirely from using the command.\nFor a user to use a command, their role must allow it, and the channel must too.\n(if no specific rule is applied to the channel, it defaults to allowing the command)"}
+_G.defcommands["permission"] = {info = "Used to add, remove or clear permissions", usage = "!permission<add/remove/clear> <command name> <mentions (@user, @role, #channel)>\nAdding an user gives the user complete authority, even if their channel and role are blacklisted.\nSimilarly, blacklisting a user bans them entirely from using the command.\nFor a user to use a command, their role must allow it, and the channel must too.\n(if no specific rule is applied to the channel, it defaults to allowing the command)"}
 _G.defcommands["whocanuse"] = {info = "Tells you who can use specified command", usage = "!whocanuse <command name>"}
-_G.defcommands["printelement"] = {info = "Prints specified element of permissions table", usage = "!printelement <path to element, layers seperated by whitespaces>\nYou can use Server.id and Me.id as placeholders for your id and the server's id"}
+_G.defcommands["printelement"] = {info = "Prints specified element of permissions table", usage = "!printelement<path to element, layers seperated by whitespaces>\nYou can use Server.id and Me.id as placeholders for your id and the server's id"}
 _G.defcommands["setdata"] = {info = "Sets any value in servers/serverID/data", usage = "!setdata <element> <value>\nYou can see the editable elements by running !printelement perms servers Server.id data\nWhile I was writing this, I noticed a bug: DON'T EDIT NUMBERS. Thanks"}
+_G.defcommands["info"] = {info = "Gives brief description of command", usage = "!info <command>"}
+_G.defcommands["usage"] = {info = "Shows usage of command", usage = "!usage <command>"}
+
+
 
 _G.events = {}
 _G.events["join"] = bit.arshift(1, 0)
@@ -143,8 +148,8 @@ M.defaultPerm = defaultPerm
 --Function to check if file exists, used in other functions
 local function fileExists(Name) --DONE
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-   	local f=io.open(Name,"r")
-   	if f~=nil then io.close(f) return true else return false end
+   	local file = io.open(Name, "r")
+   	if file ~= nil then io.close(file) return true else return false end
 end
 M.fileExists = fileExists
 
@@ -383,15 +388,16 @@ local function whoCanUse(Command, Server, Client)
 	if type(_G.perms.servers[Server.id].commands[Command].users) == "table" then
 		for k, v in pairs(_G.perms.servers[Server.id].commands[Command].users) do
 			if v ~= true and v ~= false then
-			elseif v == true then
-				allowed = "is allowed"
-			else
-				allowed = "is not allowed"
-			end
-			if Client:getMemberById(k) ~= nil then
-				str = str..Client:getMemberById(k).name.." ("..k..") "..allowed.."\n"
-			else
-				ldebug("Invalid user ID found in "..Server.name)
+				if v == true then
+					allowed = "is allowed"
+				else
+					allowed = "is not allowed"
+				end
+				if Client:getMemberById(k) ~= nil then
+					str = str..Client:getMemberById(k).name.." ("..k..") "..allowed.."\n"
+				else
+					ldebug("Invalid user ID found in "..Server.name)
+				end
 			end
 		end
 	end
@@ -399,15 +405,16 @@ local function whoCanUse(Command, Server, Client)
 	if type(_G.perms.servers[Server.id].commands[Command].channels) == "table" then
 		for k, v in pairs(_G.perms.servers[Server.id].commands[Command].channels) do
 			if v ~= true and v ~= false then
-			elseif v == true then
-				allowed = "is allowed"
-			else
-				allowed = "is not allowed"
-			end
-			if Client:getChannelById(k) ~= nil then
-				str = str..Client:getChannelById(k).name.." ("..k..") "..allowed.."\n"
-			else
-				ldebug("Invalid channel ID found in "..Server.name)
+				if v == true then
+					allowed = "is allowed"
+				else
+					allowed = "is not allowed"
+				end
+				if Client:getChannelById(k) ~= nil then
+					str = str..Client:getChannelById(k).name.." ("..k..") "..allowed.."\n"
+				else
+					ldebug("Invalid channel ID found in "..Server.name)
+				end
 			end
 		end
 	end
@@ -415,15 +422,16 @@ local function whoCanUse(Command, Server, Client)
 	if type(_G.perms.servers[Server.id].commands[Command].roles) == "table" then
 		for k, v in pairs(_G.perms.servers[Server.id].commands[Command].roles) do
 			if v ~= true and v ~= false then
-			elseif v == true then
-				allowed = "is allowed"
-			else
-				allowed = "is not allowed"
-			end
-			if Client:getRoleById(k) ~= nil then
-				str = str..Client:getRoleById(k).name.." ("..k..") "..allowed.."\n"
-			else
-				ldebug("Invalid role ID found in "..Server.name)
+				if v == true then
+					allowed = "is allowed"
+				else
+					allowed = "is not allowed"
+				end
+				if Client:getRoleById(k) ~= nil then
+					str = str..Client:getRoleById(k).name.." ("..k..") "..allowed.."\n"
+				else
+					ldebug("Invalid role ID found in "..Server.name)
+				end
 			end
 		end
 	end
@@ -432,7 +440,11 @@ local function whoCanUse(Command, Server, Client)
 end
 M.whoCanUse = whoCanUse
 
+local function Server:cmdinfo(Cmd)
+	local returnval = ""
+	if not commandExists(Cmd, self) then
+		returnval = nil
+	else
+		returnval = _G.perms.s
+		----INCOMPLETE PLEASE DON'T FORGET
 return M
-
-
-
