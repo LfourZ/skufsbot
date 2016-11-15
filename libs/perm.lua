@@ -35,11 +35,13 @@ _G.events = {}
 _G.events["join"] = bit.arshift(1, 0)
 _G.events["leave"] = bit.arshift(1, -1)
 
+--Better debug thing, will redo in the future
 local function ldebug(String)
 	if not DEBUG then return end
 	print(string.format("[%s]: %s", os.date("%c"), String))
 end
 
+--Announcements
 local function announcement(Event, Member)
 	local str = ""
 	if Event == "join" then
@@ -102,6 +104,7 @@ local function savePermFile(Server)
 end
 M.savePermFile = savePermFile
 
+--Sets values in the server specific data directory
 local function setData(String, Message)
 	local str = string.gsub(String, "Server.id", Message.server.id)
 	str = string.gsub(str, "Me.id", Message.author.id)
@@ -112,7 +115,6 @@ local function setData(String, Message)
 	savePermFile(Message.server)
 end
 M.setData = setData
-
 
 --Checks if Char is one of the server's silent or loud character. This determines whether the command gets deleted
 local function isSilent(Char, Guild)
@@ -380,6 +382,7 @@ local function editPerms(Message, Args, Guild)
 end
 M.editPerms = editPerms
 
+--Returns a nicely formatted string with details on who can use a command
 local function whoCanUse(Command, Server, Client)
 	print(Command)
 	local str = "```\n"
@@ -441,6 +444,7 @@ local function whoCanUse(Command, Server, Client)
 end
 M.whoCanUse = whoCanUse
 
+--Returns info associated with command
 local function cmdinfo(Cmd, Server)
 	local returnval = "```\n"
 	if not commandExists(Cmd, Server) then
@@ -455,6 +459,7 @@ local function cmdinfo(Cmd, Server)
 end
 M.cmdinfo = cmdinfo
 
+--Returns usage associated with command
 local function cmdusage(Cmd, Guild)
 	local returnval = "```\n"
 	if not commandExists(Cmd, Guild) then
@@ -469,6 +474,7 @@ local function cmdusage(Cmd, Guild)
 end
 M.cmdusage = cmdusage
 
+--Returns info and usage associated with command
 local function cmdhelp(Cmd, Server)
 	local returnval = ""
 	if Cmd == nil then
