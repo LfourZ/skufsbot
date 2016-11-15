@@ -1,5 +1,5 @@
 local discordia = require("discordia")
-local client = discordia.Client:new()
+local client = discordia.Client()
 local token = require("../token")
 local perm = require("./libs/perm")
 local httpfn = require("./libs/httpFunctions")
@@ -21,21 +21,21 @@ client:on("messageCreate", function(message)
 	local firstChar = string.sub(cmd, 1, 1)
 	local delete = false
 	cmd = string.lower(string.sub(cmd, 2))
-	if perm.commandExists(cmd, message.server) then
+	if perm.commandExists(cmd, message.guild) then
 		if perm.canUse(message, cmd) then
-			if perm.isSilent(firstChar, message.server) ~= nil then
-				delete = perm.isSilent(firstChar, message.server)
+			if perm.isSilent(firstChar, message.guild) ~= nil then
+				delete = perm.isSilent(firstChar, message.guild)
 				-------
 				if cmd == "test" then
 					message.channel:sendMessage("Test indeed")
 				end
 				-------
 				if cmd == "permission" then
-					message.channel:sendMessage(perm.editPerms(message.mentions, larg, message.server))
+					message.channel:sendMessage(perm.editPerms(message, larg, message.guild))
 				end
 				-------
 				if cmd == "whocanuse" then
-					message.channel:sendMessage(perm.whoCanUse(larg, message.server, client))
+					message.channel:sendMessage(perm.whoCanUse(larg, message.guild, client))
 				end
 				-------
 				if cmd == "printelement" then
@@ -49,14 +49,14 @@ client:on("messageCreate", function(message)
 					-------
 				elseif cmd == "info" then
 					if arg == nil then return end
-					message.channel:sendMessage(perm.cmdinfo(arg, message.server))
+					message.channel:sendMessage(perm.cmdinfo(arg, message.guild))
 					-------
 				elseif cmd == "usage" then
 					if arg == nil then return end
-					message.channel:sendMessage(perm.cmdusage(arg, message.server))
+					message.channel:sendMessage(perm.cmdusage(arg, message.guild))
 					-------
 				elseif cmd == "help" then
-					message.channel:sendMessage(perm.cmdhelp(arg, message.server))
+					message.channel:sendMessage(perm.cmdhelp(arg, message.guild))
 					-------
 				end
 

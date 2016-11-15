@@ -20,6 +20,17 @@
         "184262286058323968":true
       }
     },
+    "test123":{
+      "channels":{
+        "none":true
+      },
+      "roles":{
+        "none":true
+      },
+      "users":{
+        "184262286058323968":true
+      }
+    },
     "printelement":{
       "channels":{
         "none":true
@@ -42,7 +53,7 @@
         "184262286058323968":true
       }
     },
-    "permission":{
+    "help":{
       "channels":{
         "none":true
       },
@@ -53,7 +64,7 @@
         "184262286058323968":true
       }
     },
-    "test123":{
+    "permission":{
       "channels":{
         "none":true
       },
