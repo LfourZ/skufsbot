@@ -94,12 +94,12 @@ local function printElement(String, Message)
 end
 M.printElement = printElement
 
---Initial test to use JSON
-local function savePermFile(Server)
+--Saves JSON file with permissions
+local function savePermFile(Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-	local file = io.open("./perms/perms_"..Server.id..".json", "w")
+	local file = io.open("./perms/perms_"..Guild.id..".json", "w")
 	io.output(file)
-	io.write(json.encode(_G.perms.servers[Server.id], { indent = true }))
+	io.write(json.encode(_G.perms.servers[Guild.id], { indent = true }))
 	io.close(file)
 end
 M.savePermFile = savePermFile
@@ -110,7 +110,6 @@ local function setData(String, Message)
 	str = string.gsub(str, "Me.id", Message.author.id)
 	local key, value = string.match(str, "(%S+) (.*)")
 	if key == nil then return end
-
 	_G.perms.servers[Message.server.id].data[key] = value
 	savePermFile(Message.server)
 end
@@ -130,7 +129,7 @@ end
 M.isSilent = isSilent
 
 --Checks Table for Id, if nothing is found, it defaults to Bool
-local function checkForPerm(Table, Id, Bool) --DONE
+local function checkForPerm(Table, Id, Bool)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
 	local result = false
 	if Table[Id] == true then
@@ -157,16 +156,16 @@ end
 M.fileExists = fileExists
 
 --Creates table structure and default entries for a server, used for instance when new server is detected
-local function generatePermTable(Server, Table) --I DUNNO
+local function generatePermTable(Guild, Table) --I DUNNO
 	ldebug("Running function "..debug.getinfo(1, "n").name)
 	local tbl = {}
 	tbl["data"] = {}
 	tbl.data["silentchar"] = "/"
 	tbl.data["loudchar"] = "!"
-	tbl.data["servername"] = Server.name
+	tbl.data["servername"] = Guild.name
 	tbl.data["joinmsg"] = "User has joined the server"
 	tbl.data["leavemsg"] = "User has left the server"
-	tbl.data["msgchannel"] = Server.defaultChannel.id
+	tbl.data["msgchannel"] = Guild.defaultChannel.id
 	tbl.data["msgsettings"] = 3
 	tbl["commands"] = {}
 	for k, v in pairs(Table) do
@@ -178,38 +177,36 @@ local function generatePermTable(Server, Table) --I DUNNO
 		tbl.commands[k].users = {}
 		tbl.commands[k].users[ROOT_USER] = true
 	end
-	_G.perms.servers[Server.id] = tbl
-	savePermFile(Server)
+	_G.perms.servers[Guild.id] = tbl
+	savePermFile(Guild)
 end
 M.generatePermTable = generatePermTable
 
 --Registers a new Command on a Server. Called when default command doesn't exist on a server
-local function addCommand(Command, Server)
+local function addCommand(Command, Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-	_G.perms.servers[Server.id].commands[Command] = {}
-	_G.perms.servers[Server.id].commands[Command].roles =  {}
-	_G.perms.servers[Server.id].commands[Command].roles[ROOT_ROLE] = true
-	_G.perms.servers[Server.id].commands[Command].channels = {}
-	_G.perms.servers[Server.id].commands[Command].channels[ROOT_CHANNEL] = true
-	_G.perms.servers[Server.id].commands[Command].users = {}
-	_G.perms.servers[Server.id].commands[Command].users[ROOT_USER] = true
-	savePermFile(Server)
+	_G.perms.servers[Guild.id].commands[Command] = {}
+	_G.perms.servers[Guild.id].commands[Command].roles =  {}
+	_G.perms.servers[Guild.id].commands[Command].roles[ROOT_ROLE] = true
+	_G.perms.servers[Guild.id].commands[Command].channels = {}
+	_G.perms.servers[Guild.id].commands[Command].channels[ROOT_CHANNEL] = true
+	_G.perms.servers[Guild.id].commands[Command].users = {}
+	_G.perms.servers[Guild.id].commands[Command].users[ROOT_USER] = true
+	savePermFile(Guild)
 end
 M.addCommand = addCommand
 
 --Converts JSON with permissions for Server into table and loads it in the global table
-local function loadPermFile(Server)
-
+local function loadPermFile(Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
 	local file = io.open("./perms/perms_"..Server.id..".json", "r")
 	io.input(file)
 	local worked = false
-
 	local obj, pos, err = json.decode(io.read("*a"), 1, nil)
 	if err then
   		ldebug("Error:", err)
 	else
-		_G.perms.servers[Server.id] = obj
+		_G.perms.servers[Guild.id] = obj
 		worked = true
 	end
 	io.close(file)
@@ -249,9 +246,9 @@ end
 M.checkForPermFile = checkForPermFile
 
 --Checks if the permissions are loaded in the global table for Server
-local function isPermsLoaded(Server) --DONE
+local function isPermsLoaded(Guild) --DONE
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-	if _G.perms.servers[Server.id] ~= nil then
+	if _G.perms.servers[Guild.id] ~= nil then
 		return true
 	else
 		return false
@@ -262,7 +259,7 @@ M.isPermsLoaded = isPermsLoaded
 --Takes two tables, and first cross checks the key. If match is found, the values are compared. If values also match,
 --returns true or false (if found), and breaks. If values don't match, goes back to beginning. If nothing is found,
 --return defaults to Bool
-local function crossCheckKey(Function, Table2, Bool, Server)
+local function crossCheckKey(Function, Table2, Bool, Guild)
 	local found = false
 	local result = Bool
 	for k, v in Function do
@@ -284,9 +281,9 @@ local function crossCheckKey(Function, Table2, Bool, Server)
 			end
 		end
 	end
-	if Table2[Server.defaultRole.id] == true then
+	if Table2[Guild.defaultRole.id] == true then
 		result = true
-	elseif Table2[Server.defaultRole.id] == false then
+	elseif Table2[Guild.defaultRole.id] == false then
 		result = false
 	end
 	ldebug("Function "..debug.getinfo(1, "n").name.." returned: "..tostring(result))
@@ -383,14 +380,14 @@ end
 M.editPerms = editPerms
 
 --Returns a nicely formatted string with details on who can use a command
-local function whoCanUse(Command, Server, Client)
+local function whoCanUse(Command, Guild, Client)
 	print(Command)
 	local str = "```\n"
 	local allowed = ""
-	if commandExists(Command, Server) == false then return end
+	if commandExists(Command, Guild) == false then return end
 	str = str.."Members who can/cannot use command "..Command..":\n"
-	if type(_G.perms.servers[Server.id].commands[Command].users) == "table" then
-		for k, v in pairs(_G.perms.servers[Server.id].commands[Command].users) do
+	if type(_G.perms.servers[Guild.id].commands[Command].users) == "table" then
+		for k, v in pairs(_G.perms.servers[Guild.id].commands[Command].users) do
 			if v ~= true and v ~= false then
 				if v == true then
 					allowed = "is allowed"
@@ -400,14 +397,14 @@ local function whoCanUse(Command, Server, Client)
 				if Client:getMemberById(k) ~= nil then
 					str = str..Client:getMemberById(k).name.." ("..k..") "..allowed.."\n"
 				else
-					ldebug("Invalid user ID found in "..Server.name)
+					ldebug("Invalid user ID found in "..Guild.name)
 				end
 			end
 		end
 	end
 	str = str.."Channels that can/cannot use command "..Command..":\n"
-	if type(_G.perms.servers[Server.id].commands[Command].channels) == "table" then
-		for k, v in pairs(_G.perms.servers[Server.id].commands[Command].channels) do
+	if type(_G.perms.servers[Guild.id].commands[Command].channels) == "table" then
+		for k, v in pairs(_G.perms.servers[Guild.id].commands[Command].channels) do
 			if v ~= true and v ~= false then
 				if v == true then
 					allowed = "is allowed"
@@ -417,14 +414,14 @@ local function whoCanUse(Command, Server, Client)
 				if Client:getChannelById(k) ~= nil then
 					str = str..Client:getChannelById(k).name.." ("..k..") "..allowed.."\n"
 				else
-					ldebug("Invalid channel ID found in "..Server.name)
+					ldebug("Invalid channel ID found in "..Guild.name)
 				end
 			end
 		end
 	end
 	str = str.."Roles that can/cannot use command "..Command..":\n"
-	if type(_G.perms.servers[Server.id].commands[Command].roles) == "table" then
-		for k, v in pairs(_G.perms.servers[Server.id].commands[Command].roles) do
+	if type(_G.perms.servers[Guild.id].commands[Command].roles) == "table" then
+		for k, v in pairs(_G.perms.servers[Guild.id].commands[Command].roles) do
 			if v ~= true and v ~= false then
 				if v == true then
 					allowed = "is allowed"
@@ -434,7 +431,7 @@ local function whoCanUse(Command, Server, Client)
 				if Client:getRoleById(k) ~= nil then
 					str = str..Client:getRoleById(k).name.." ("..k..") "..allowed.."\n"
 				else
-					ldebug("Invalid role ID found in "..Server.name)
+					ldebug("Invalid role ID found in "..Guild.name)
 				end
 			end
 		end
@@ -445,9 +442,9 @@ end
 M.whoCanUse = whoCanUse
 
 --Returns info associated with command
-local function cmdinfo(Cmd, Server)
+local function cmdinfo(Cmd, Guild)
 	local returnval = "```\n"
-	if not commandExists(Cmd, Server) then
+	if not commandExists(Cmd, Guild) then
 		returnval = nil
 	elseif type(_G.defcommands[Cmd].info) ~= "string" then
 		returnval = returnval.."This command has no info attached to it yet"
@@ -475,16 +472,16 @@ end
 M.cmdusage = cmdusage
 
 --Returns info and usage associated with command
-local function cmdhelp(Cmd, Server)
+local function cmdhelp(Cmd, Guild)
 	local returnval = ""
 	if Cmd == nil then
 		returnval = "```Commandlist not yet implemented```"
 	else
-		if not commandExists(Cmd, Server) then
+		if not commandExists(Cmd, Guild) then
 			returnval = "```\nCommand '"..Cmd.."' doesn't exist.\n```"
 		else
-			returnval = returnval..cmdinfo(Cmd, Server).."\n"
-			returnval = returnval..cmdusage(Cmd, Server)
+			returnval = returnval..cmdinfo(Cmd, Guild).."\n"
+			returnval = returnval..cmdusage(Cmd, Guild)
 		end
 	end
 	return returnval
