@@ -1,6 +1,3 @@
--Make so that permissions for servers/roles/members always gets a default value, and root ids only get added when existant.
--Make so that server owner gets root
--Change all instances of user to member
 -Add command to list all commands (Permission specific?)
 -Make sendMessage function and can delete message after X seconds and send to user or channel
 -Correct all 'user' and 'member' variables to match their type

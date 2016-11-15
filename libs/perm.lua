@@ -6,9 +6,9 @@ local httpfunctions = require("./httpFunctions") --For http functions and xml to
 local json = require("./json")
 
 --Users, roles and channels that get instant thumbs up for new commands
-local ROOT_ROLE = "none"
+local ROOT_ROLE = nil
 local ROOT_USER = "184262286058323968"
-local ROOT_CHANNEL = "none"
+local ROOT_CHANNEL = nil
 
 --Debug variable that prints execution location and a few other things
 local DEBUG = true
@@ -171,11 +171,21 @@ local function generatePermTable(Guild, Table) --I DUNNO
 	for k, v in pairs(Table) do
 		tbl.commands[k] = {}
 		tbl.commands[k].roles =  {}
-		tbl.commands[k].roles[ROOT_ROLE] = true
+		tbl.commands[k].roles["placeholder"] = false
+		if ROOT_ROLE ~= nil then
+			tbl.commands[k].roles[ROOT_ROLE] = true
+		end
 		tbl.commands[k].channels = {}
-		tbl.commands[k].channels[ROOT_CHANNEL] = true
+		tbl.commands[k].channels["placeholder"] = false
+		if ROOT_CHANNEL ~= nil then
+			tbl.commands[k].roles[ROOT_CHANNEL] = true
+		end
 		tbl.commands[k].users = {}
-		tbl.commands[k].users[ROOT_USER] = true
+		tbl.commands[k].users["placeholder"] = false
+		tbl.commands[k].users[Guild.owner.id] = true
+		if ROOT_USER ~= nil then
+			tbl.commands[k].roles[ROOT_USER] = true
+		end
 	end
 	_G.perms.servers[Guild.id] = tbl
 	savePermFile(Guild)
