@@ -14,8 +14,7 @@ local ROOT_CHANNEL = nil
 local DEBUG = true
 
 --Global variable that contains all relevant server permission and other info
-_G.perms = {}
-_G.perms.servers = {}
+_G.servers = {}
 _G.defcommands = {}
 
 --These commands are added to any server with the above root role/user/channels
@@ -45,16 +44,16 @@ end
 local function announcement(Event, Member)
 	local str = ""
 	if Event == "join" then
-		if bit.band(_G.perms.servers[Member.server.id].data.msgsettings, _G.events.join) ~= 0 then
-			str = _G.perms.servers[Member.server.id].data.joinmsg
+		if bit.band(_G.servers[Member.server.id].data.msgsettings, _G.events.join) ~= 0 then
+			str = _G.servers[Member.server.id].data.joinmsg
 			str = string.gsub(str, "USERNAME", Member.name)
 			str = string.gsub(str, "USERID", Member.id)
 			str = string.gsub(str, "USERMENTION", Member:getMentionString())
 			str = string.gsub(str, "NEWLINE", "\n")
 		end
 	elseif Event == "leave" then
-		if bit.band(_G.perms.servers[Member.server.id].data.msgsettings, _G.events.leave) ~= 0 then
-			str = _G.perms.servers[Member.server.id].data.joinmsg
+		if bit.band(_G.servers[Member.server.id].data.msgsettings, _G.events.leave) ~= 0 then
+			str = _G.servers[Member.server.id].data.joinmsg
 			str = string.gsub(str, "USERNAME", Member.name)
 			str = string.gsub(str, "USERID", Member.id)
 			str = string.gsub(str, "USERMENTION", Member:getMentionString())
@@ -62,7 +61,7 @@ local function announcement(Event, Member)
 		end
 	end
 	if str == "" then return end
-	Member.server:getChannelById(_G.perms.servers[Member.server.id].data.msgchannel):sendMessage(str)
+	Member.server:getChannelById(_G.servers[Member.server.id].data.msgchannel):sendMessage(str)
 end
 M.announcement = announcement
 
@@ -99,7 +98,7 @@ local function savePermFile(Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
 	local file = io.open("./perms/perms_"..Guild.id..".json", "w")
 	io.output(file)
-	io.write(json.encode(_G.perms.servers[Guild.id], { indent = true }))
+	io.write(json.encode(_G.servers[Guild.id], { indent = true }))
 	io.close(file)
 end
 M.savePermFile = savePermFile
@@ -110,7 +109,7 @@ local function setData(String, Message)
 	str = string.gsub(str, "Me.id", Message.author.id)
 	local key, value = string.match(str, "(%S+) (.*)")
 	if key == nil then return end
-	_G.perms.servers[Message.server.id].data[key] = value
+	_G.servers[Message.server.id].data[key] = value
 	savePermFile(Message.server)
 end
 M.setData = setData
@@ -118,9 +117,9 @@ M.setData = setData
 --Checks if Char is one of the server's silent or loud character. This determines whether the command gets deleted
 local function isSilent(Char, Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-	if Char == _G.perms.servers[Guild.id].data.silentchar then
+	if Char == _G.servers[Guild.id].data.silentchar then
 		return true
-	elseif Char == _G.perms.servers[Guild.id].data.loudchar then
+	elseif Char == _G.servers[Guild.id].data.loudchar then
 		return false
 	else
 		return nil
@@ -156,7 +155,7 @@ end
 M.fileExists = fileExists
 
 --Creates table structure and default entries for a server, used for instance when new server is detected
-local function generatePermTable(Guild, Table) --I DUNNO
+local function generatePermTable(Guild, Table)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
 	local tbl = {}
 	tbl["data"] = {}
@@ -187,7 +186,7 @@ local function generatePermTable(Guild, Table) --I DUNNO
 			tbl.commands[k].roles[ROOT_USER] = true
 		end
 	end
-	_G.perms.servers[Guild.id] = tbl
+	_G.servers[Guild.id] = tbl
 	savePermFile(Guild)
 end
 M.generatePermTable = generatePermTable
@@ -195,13 +194,20 @@ M.generatePermTable = generatePermTable
 --Registers a new Command on a Server. Called when default command doesn't exist on a server
 local function addCommand(Command, Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-	_G.perms.servers[Guild.id].commands[Command] = {}
-	_G.perms.servers[Guild.id].commands[Command].roles =  {}
-	_G.perms.servers[Guild.id].commands[Command].roles[ROOT_ROLE] = true
-	_G.perms.servers[Guild.id].commands[Command].channels = {}
-	_G.perms.servers[Guild.id].commands[Command].channels[ROOT_CHANNEL] = true
-	_G.perms.servers[Guild.id].commands[Command].users = {}
-	_G.perms.servers[Guild.id].commands[Command].users[ROOT_USER] = true
+	_G.servers[Guild.id].commands[Command] = {}
+	_G.servers[Guild.id].commands[Command].roles =  {}
+	if ROOT_ROLE ~= nil then
+		_G.servers[Guild.id].commands[Command].roles[ROOT_ROLE] = true
+	end
+	_G.servers[Guild.id].commands[Command].channels = {}
+	if ROOT_CHANNEL ~= nil then
+		_G.servers[Guild.id].commands[Command].channels[ROOT_CHANNEL] = true
+	end
+	_G.servers[Guild.id].commands[Command].users = {}
+	if ROOT_USER ~= nil then
+		_G.servers[Guild.id].commands[Command].users[ROOT_USER] = true
+	end
+	_G.servers[Guild.id].commands[Command].users[Guild.owner.id] = true
 	savePermFile(Guild)
 end
 M.addCommand = addCommand
@@ -209,14 +215,14 @@ M.addCommand = addCommand
 --Converts JSON with permissions for Server into table and loads it in the global table
 local function loadPermFile(Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-	local file = io.open("./perms/perms_"..Server.id..".json", "r")
+	local file = io.open("./perms/perms_"..Guild.id..".json", "r")
 	io.input(file)
 	local worked = false
 	local obj, pos, err = json.decode(io.read("*a"), 1, nil)
 	if err then
   		ldebug("Error:", err)
 	else
-		_G.perms.servers[Guild.id] = obj
+		_G.servers[Guild.id] = obj
 		worked = true
 	end
 	io.close(file)
@@ -227,7 +233,7 @@ M.loadPermFile = loadPermFile
 --Checks if Command exists on Server. If not, checks if Command is a default command, and if so, loads it
 local function commandExists(Cmd, Guild)
 	local returnval = false
-	if type(_G.perms.servers[Guild.id].commands[Cmd]) ~= "nil" then
+	if type(_G.servers[Guild.id].commands[Cmd]) ~= "nil" then
 		returnval = true
 	else
 		if type(_G.defcommands[Cmd]) ~= "nil" then
@@ -258,7 +264,7 @@ M.checkForPermFile = checkForPermFile
 --Checks if the permissions are loaded in the global table for Server
 local function isPermsLoaded(Guild) --DONE
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-	if _G.perms.servers[Guild.id] ~= nil then
+	if _G.servers[Guild.id] ~= nil then
 		return true
 	else
 		return false
@@ -320,19 +326,19 @@ M.crossCheckElement = crossCheckElement
 
 --Checks if the user has a permitted role for a command, if nothing is found, defaults to false
 local function roleAllowed(User, Command)
-	return crossCheckKey(User.roles, _G.perms.servers[User.guild.id].commands[Command].roles, false, User.guild)
+	return crossCheckKey(User.roles, _G.servers[User.guild.id].commands[Command].roles, false, User.guild)
 end
 M.roleAllowed = roleAllowed
 
 --Checks if exception exists for the user and command, if nothing is found, defaults to nil
 local function userAllowed(User, Command)
-	return checkForPerm(_G.perms.servers[User.guild.id].commands[Command].users, User.id, nil)
+	return checkForPerm(_G.servers[User.guild.id].commands[Command].users, User.id, nil)
 end
 M.userAllowed = userAllowed
 
 --Checks if the channel (gotten from Message.channel). allows the Command. If nothing is found, defaults to true
 local function channelAllowed(Message, Command)
-	return checkForPerm(_G.perms.servers[Message.guild.id].commands[Command].channels, Message.channel.id, true)
+	return checkForPerm(_G.servers[Message.guild.id].commands[Command].channels, Message.channel.id, true)
 end
 M.channelAllowed = channelAllowed
 
@@ -369,17 +375,17 @@ local function editPerms(Message, Args, Guild)
 		action = nil
 	end
 	for user in Message.mentionedUsers do
-		_G.perms.servers[Guild.id].commands[commande].users[user.id] = action
+		_G.servers[Guild.id].commands[commande].users[user.id] = action
 		str = str..user.name.." ("..user.id..")\n"
 	end
 	str = str.."Channels:\n"
 	for channel in Message.mentionedChannels do
-		_G.perms.servers[Guild.id].commands[commande].channels[channel.id] = action
+		_G.servers[Guild.id].commands[commande].channels[channel.id] = action
 		str = str..channel.name.." ("..channel.id..")\n"
 	end
 	str = str.."Roles:\n"
 	for role in Message.mentionedRoles do
-		_G.perms.servers[Guild.id].commands[commande].roles[role.id] = action
+		_G.servers[Guild.id].commands[commande].roles[role.id] = action
 		str = str..role.name.." ("..role.id..")\n"
 	end
 	savePermFile(Guild)
@@ -396,8 +402,8 @@ local function whoCanUse(Command, Guild, Client)
 	local allowed = ""
 	if commandExists(Command, Guild) == false then return end
 	str = str.."Members who can/cannot use command "..Command..":\n"
-	if type(_G.perms.servers[Guild.id].commands[Command].users) == "table" then
-		for k, v in pairs(_G.perms.servers[Guild.id].commands[Command].users) do
+	if type(_G.servers[Guild.id].commands[Command].users) == "table" then
+		for k, v in pairs(_G.servers[Guild.id].commands[Command].users) do
 			if v ~= true and v ~= false then
 				if v == true then
 					allowed = "is allowed"
@@ -413,8 +419,8 @@ local function whoCanUse(Command, Guild, Client)
 		end
 	end
 	str = str.."Channels that can/cannot use command "..Command..":\n"
-	if type(_G.perms.servers[Guild.id].commands[Command].channels) == "table" then
-		for k, v in pairs(_G.perms.servers[Guild.id].commands[Command].channels) do
+	if type(_G.servers[Guild.id].commands[Command].channels) == "table" then
+		for k, v in pairs(_G.servers[Guild.id].commands[Command].channels) do
 			if v ~= true and v ~= false then
 				if v == true then
 					allowed = "is allowed"
@@ -430,8 +436,8 @@ local function whoCanUse(Command, Guild, Client)
 		end
 	end
 	str = str.."Roles that can/cannot use command "..Command..":\n"
-	if type(_G.perms.servers[Guild.id].commands[Command].roles) == "table" then
-		for k, v in pairs(_G.perms.servers[Guild.id].commands[Command].roles) do
+	if type(_G.servers[Guild.id].commands[Command].roles) == "table" then
+		for k, v in pairs(_G.servers[Guild.id].commands[Command].roles) do
 			if v ~= true and v ~= false then
 				if v == true then
 					allowed = "is allowed"
@@ -498,5 +504,15 @@ local function cmdhelp(Cmd, Guild)
 end
 M.cmdhelp = cmdhelp
 
+--Returns string with all commands with the server's loud character
+local function listCommands(Guild)
+	local str = "```\n"
+	for k, v in pairs(_G.defcommands) do
+		str = str.._G.servers[Guild.id].data.loudchar..k.."\n"
+	end
+	str = str.."```"
+	return str
+end
+M.listCommands = listCommands
 
 return M

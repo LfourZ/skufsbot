@@ -56,7 +56,11 @@ client:on("messageCreate", function(message)
 					message.channel:sendMessage(perm.cmdusage(arg, message.guild))
 					-------
 				elseif cmd == "help" then
-					message.channel:sendMessage(perm.cmdhelp(arg, message.guild))
+					if larg then
+						message.channel:sendMessage(perm.cmdhelp(arg, message.guild))
+					else
+						message.channel:sendMessage(perm.listCommands(message.guild))
+					end
 					-------
 				end
 
