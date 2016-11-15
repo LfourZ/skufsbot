@@ -3,3 +3,5 @@
 -Change all instances of user to member
 -Add command to list all commands (Permission specific?)
 -Make sendMessage function and can delete message after X seconds and send to user or channel
+-Correct all 'user' and 'member' variables to match their type
+-Remove extra parameters from functions (Such as taking 'user', 'message' and 'server', and using the message object to get the rest)
