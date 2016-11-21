@@ -1,100 +1,147 @@
 {
   "data":{
-    "silentchar":"/",
-    "loudchar":"!",
-    "joinmsg":"User has joined the server",
-    "msgchannel":"233195596025036802",
+    "modules":{
+      "modules":{
+        "base":{
+          "commands":{
+            "info":{
+              "info":"A test command.",
+              "usage":"!test"
+            },
+            "help":[],
+            "whocanuse":[],
+            "permission":{
+              "info":"Used to add, remove or clear permissions.",
+              "usage":"!permission<add/remove/clear> <command name> <mentions (@user, @role, #channel)>\n\nAdding an user gives the user complete authority, even if their channel and role are blacklisted.\nSimilarly, blacklisting a user bans them entirely from using the command.\nFor a user to use a command, their role must allow it, and the channel must too.\n(if no specific rule is applied to the channel, it defaults to allowing the command)"
+            },
+            "usage":[]
+          },
+          "version":0.1
+        },
+        "debug":{
+          "commands":{
+            "printelement":[],
+            "test":{
+              "info":"A test command.",
+              "usage":"!test"
+            },
+            "setdata":[]
+          },
+          "version":0.1
+        }
+      }
+    },
     "msgsettings":3,
+    "loudchar":"!",
+    "leavemsg":"User has left the server",
+    "msgchannel":"233195596025036802",
+    "joinmsg":"User has joined the server",
     "servername":"The Server For Stale Meymeys",
-    "leavemsg":"User has left the server"
+    "silentchar":"/"
   },
   "commands":{
-    "help":{
-      "channels":{
-        "none":true
-      },
-      "roles":{
-        "none":true
-      },
-      "users":{
-        "184262286058323968":true
-      }
-    },
     "whocanuse":{
       "channels":{
-        "none":true
+        "placeholder":false
       },
       "roles":{
-        "none":true
+        "placeholder":false,
+        "184262286058323968":true
       },
       "users":{
-        "184262286058323968":true
-      }
-    },
-    "info":{
-      "channels":{
-        "none":true
-      },
-      "roles":{
-        "none":true
-      },
-      "users":{
-        "184262286058323968":true
-      }
-    },
-    "setdata":{
-      "channels":{
-        "none":true
-      },
-      "roles":{
-        "none":true
-      },
-      "users":{
-        "184262286058323968":true
+        "placeholder":false,
+        "225536026293043200":true
       }
     },
     "permission":{
       "channels":{
-        "none":true
+        "placeholder":false
       },
       "roles":{
-        "none":true
+        "placeholder":false,
+        "184262286058323968":true
       },
       "users":{
-        "184262286058323968":true
+        "placeholder":false,
+        "225536026293043200":true
       }
     },
     "printelement":{
       "channels":{
-        "none":true
+        "placeholder":false
       },
       "roles":{
-        "none":true
+        "placeholder":false,
+        "184262286058323968":true
       },
       "users":{
+        "placeholder":false,
+        "225536026293043200":true
+      }
+    },
+    "setdata":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
         "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "225536026293043200":true
+      }
+    },
+    "help":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "225536026293043200":true
+      }
+    },
+    "info":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "225536026293043200":true
       }
     },
     "test":{
       "channels":{
-        "none":true
+        "placeholder":false
       },
       "roles":{
-        "none":true
+        "placeholder":false,
+        "184262286058323968":true
       },
       "users":{
-        "184262286058323968":true
+        "placeholder":false,
+        "225536026293043200":true
       }
     },
     "usage":{
       "channels":{
-        "none":true
+        "placeholder":false
       },
       "roles":{
-        "none":true
+        "placeholder":false,
+        "184262286058323968":true
       },
       "users":{
-        "184262286058323968":true
+        "placeholder":false,
+        "225536026293043200":true
       }
     }
   }

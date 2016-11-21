@@ -64,10 +64,7 @@ client:on("messageCreate", function(message)
 					-------
 				end
 
-
-
 				--Put commands here
-
 
 				if delete then
 					message:delete()

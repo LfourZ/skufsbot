@@ -4,6 +4,7 @@ local M = {}
 local ltable = require("./ltable") --For a few table functions
 local httpfunctions = require("./httpFunctions") --For http functions and xml to table
 local json = require("./json")
+local modules = require("./modules")
 
 --Users, roles and channels that get instant thumbs up for new commands
 local ROOT_ROLE = nil
@@ -166,6 +167,7 @@ local function generatePermTable(Guild, Table)
 	tbl.data["leavemsg"] = "User has left the server"
 	tbl.data["msgchannel"] = Guild.defaultChannel.id
 	tbl.data["msgsettings"] = 3
+	tbl.data["modules"] = modules.data
 	tbl["commands"] = {}
 	for k, v in pairs(Table) do
 		tbl.commands[k] = {}
