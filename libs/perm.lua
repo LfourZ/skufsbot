@@ -20,19 +20,6 @@ local DEBUG = true
 
 --Global variable that contains all relevant server permission and other info
 _G.servers = {}
-_G.defcommands = {}
-
---These commands are added to any server with the above root role/user/channels
---TEMPLATE: _G.defcommands[""] = {info = nil, usage = nil}
-_G.defcommands["test"] = {info = "A test command.", usage = "!test"}
-_G.defcommands["permission"] = {info = "Used to add, remove or clear permissions", usage = "!permission<add/remove/clear> <command name> <mentions (@user, @role, #channel)>\n\nAdding an user gives the user complete authority, even if their channel and role are blacklisted.\nSimilarly, blacklisting a user bans them entirely from using the command.\nFor a user to use a command, their role must allow it, and the channel must too.\n(if no specific rule is applied to the channel, it defaults to allowing the command)"}
-_G.defcommands["whocanuse"] = {info = "Tells you who can use specified command", usage = "!whocanuse <command name>"}
-_G.defcommands["printelement"] = {info = "Prints specified element of permissions table", usage = "!printelement<path to element, layers seperated by whitespaces>\n\nYou can use Server.id and Me.id as placeholders for your id and the server's id"}
-_G.defcommands["setdata"] = {info = "Sets any value in servers/serverID/data", usage = "!setdata <element> <value>\n\nYou can see the editable elements by running !printelement perms servers Server.id data\nWhile I was writing this, I noticed a bug: DON'T EDIT NUMBERS. Thanks"}
-_G.defcommands["info"] = {info = "Gives brief description of command", usage = "!info <command>"}
-_G.defcommands["usage"] = {info = "Shows usage of command", usage = "!usage <command>"}
-_G.defcommands["help"] = {info = nil, usage = nil}
-
 
 
 _G.events = {}
@@ -291,7 +278,7 @@ local function checkForPermFile(Client)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
 	for Guild in Client.guilds do
 		if not fileExists("./perms/perms_"..Guild.id..".json") then
-			generatePermTable(Guild, _G.defcommands)
+			generatePermTable(Guild)
 		else
 			loadPermFile(Guild)
 		end
@@ -498,12 +485,13 @@ M.whoCanUse = whoCanUse
 --Returns info associated with command
 local function cmdinfo(Cmd)
 	local returnval = "```\n"
-	if not commandExists(Cmd) then
+	local found modName = commandExists(Cmd)
+	if not found then
 		returnval = nil
-	elseif type(_G.defcommands[Cmd].info) ~= "string" then
+	elseif type(MDATA.modules[modName][Cmd].info) ~= "string" then
 		returnval = returnval.."This command has no info attached to it yet"
 	else
-		returnval = returnval.._G.defcommands[Cmd].info
+		returnval = returnval..MDATA.modules[modName][Cmd].info
 	end
 	returnval = returnval.."```"
 	return returnval
@@ -513,12 +501,13 @@ M.cmdinfo = cmdinfo
 --Returns usage associated with command
 local function cmdusage(Cmd)
 	local returnval = "```\n"
-	if not commandExists(Cmd) then
+	local found, modName = commandExists(Cmd)
+	if not found then
 		returnval = nil
-	elseif type([Cmd].usage) ~= "string" then
+	elseif type(MDATA.modules[modName][Cmd].usage) ~= "string" then
 		returnval = returnval.."This command has no usage info attached to it yet"
 	else
-		returnval = returnval.._G.defcommands[Cmd].usage
+		returnval = returnval..MDATA.modules[modName][Cmd].usage
 	end
 	returnval = returnval.."```"
 	return returnval
@@ -545,8 +534,11 @@ M.cmdhelp = cmdhelp
 --Returns string with all commands with the server's loud character
 local function listCommands(Guild)
 	local str = "```\n"
-	for k, v in pairs(_G.defcommands) do
-		str = str.._G.servers[Guild.id].data.loudchar..k.."\n"
+	for k, v in pairs(_G.servers[Guild.id].data.modules) do
+		if v then
+			for command, _ in pairs(MDATA.modules[k].commands)
+			str = str.._G.servers[Guild.id].data.loudchar..command.."\n"
+		end
 	end
 	str = str.."```"
 	return str
