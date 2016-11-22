@@ -31,6 +31,7 @@ client:on("messageCreate", function(message)
 				end
 				-------
 				if cmd == "permission" then
+					if arg == nil then return end
 					message.channel:sendMessage(perm.editPerms(message, larg, message.guild))
 				end
 				-------
