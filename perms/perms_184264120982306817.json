@@ -1,45 +1,19 @@
 {
   "data":{
+    "silentchar":"/",
+    "loudchar":"!",
+    "joinmsg":"User has joined the server",
     "modules":{
       "base":true,
       "debug":false
     },
-    "msgsettings":3,
-    "loudchar":"!",
-    "leavemsg":"User has left the server",
     "msgchannel":"184264120982306817",
-    "joinmsg":"User has joined the server",
+    "msgsettings":3,
     "servername":"Honest men",
-    "silentchar":"/"
+    "leavemsg":"User has left the server"
   },
   "commands":{
     "info":{
-      "channels":{
-        "placeholder":false
-      },
-      "roles":{
-        "placeholder":false,
-        "184262286058323968":true
-      },
-      "users":{
-        "placeholder":false,
-        "184262286058323968":true
-      }
-    },
-    "help":{
-      "channels":{
-        "placeholder":false
-      },
-      "roles":{
-        "placeholder":false,
-        "184262286058323968":true
-      },
-      "users":{
-        "placeholder":false,
-        "184262286058323968":true
-      }
-    },
-    "usage":{
       "channels":{
         "placeholder":false
       },
@@ -65,7 +39,40 @@
         "184262286058323968":true
       }
     },
+    "help":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "184262286058323968":true
+      }
+    },
     "whocanuse":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "184262286058323968":true
+      }
+    },
+    "test":{
+      "channels":[],
+      "roles":[],
+      "users":{
+        "184262286058323968":true
+      }
+    },
+    "usage":{
       "channels":{
         "placeholder":false
       },

@@ -240,6 +240,20 @@ local function loadPermFile(Guild)
 end
 M.loadPermFile = loadPermFile
 
+local function commandExists(Command)
+	local found = false
+	local moduleName = nil
+	for mod, table in pairs(MDATA.modules) do
+		if table.commands[Command] then
+			found = true
+			moduleName = mod
+			break
+		end
+	end
+	return found, moduleName
+end
+M.commandExists = commandExists
+
 --Checks if Command exists on Server. If not, checks if Command is a default command, and if so, loads it
 local function commandLoaded(Cmd, Guild)
 	local returnval = false
@@ -257,20 +271,6 @@ local function commandLoaded(Cmd, Guild)
 	return returnval
 end
 M.commandLoaded = commandLoaded
-
-local function commandExists(Command)
-	local found = false
-	local moduleName = nil
-	for mod, table in pairs(MDATA.modules) do
-		if table.commands[Command] then
-			found = true
-			moduleName = mod
-			break
-		end
-	end
-	return found, moduleName
-end
-M.commandExists = commandExists
 
 
 --Checks for permission JSON file for ALL servers, when server without file is found, generates server file with default commands
