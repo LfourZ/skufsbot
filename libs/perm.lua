@@ -273,13 +273,15 @@ M.commandLoaded = commandLoaded
 
 local function commandExists(Command)
 	local found = false
+	local moduleName = nil
 	for mod, table in pairs(MDATA.modules) do
 		if table.commands[Command] then
-			found =  true
+			found = true
+			moduleName = mod
 			break
 		end
 	end
-	return found
+	return found, moduleName
 end
 M.commandExists = commandExists
 
@@ -513,7 +515,7 @@ local function cmdusage(Cmd)
 	local returnval = "```\n"
 	if not commandExists(Cmd) then
 		returnval = nil
-	elseif type(_G.defcommands[Cmd].usage) ~= "string" then
+	elseif type([Cmd].usage) ~= "string" then
 		returnval = returnval.."This command has no usage info attached to it yet"
 	else
 		returnval = returnval.._G.defcommands[Cmd].usage
