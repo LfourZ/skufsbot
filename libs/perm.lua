@@ -517,15 +517,11 @@ M.cmdusage = cmdusage
 --Returns info and usage associated with command
 local function cmdhelp(Cmd)
 	local returnval = ""
-	if Cmd == nil then
-		returnval = "```Commandlist not yet implemented```"
+	if not commandExists(Cmd) then
+		returnval = "```\nCommand '"..Cmd.."' doesn't exist.\n```"
 	else
-		if not commandExists(Cmd) then
-			returnval = "```\nCommand '"..Cmd.."' doesn't exist.\n```"
-		else
-			returnval = returnval..cmdinfo(Cmd).."\n"
-			returnval = returnval..cmdusage(Cmd)
-		end
+		returnval = returnval..cmdinfo(Cmd).."\n"
+		returnval = returnval..cmdusage(Cmd)
 	end
 	return returnval
 end
