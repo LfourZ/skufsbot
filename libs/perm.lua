@@ -388,7 +388,6 @@ M.canUse = canUse
 --info about the permission changes, formatted with backticks for discord
 local function editPerms(Message, Args, Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
-	if Args == nil then return nil, "0:argument was nil" end
 	local action, commande = string.match(Args, "(%S+) (%S+)")
 	if not commandExists(commande) then print("Command "..commande.." doesn't exist.") return end
 	local str = "```\n"
@@ -543,6 +542,13 @@ local function listCommands(Guild)
 end
 M.listCommands = listCommands
 
-
+local function moduleActive(String, Guild)
+	if not moduleExists(String) then
+		return false
+	else
+		return _G.servers[Guild.id].data.modules[String]
+	end
+end
+M.moduleActive = moduleActive
 
 return M
