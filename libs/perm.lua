@@ -156,7 +156,8 @@ end
 M.moduleExists = moduleExists
 
 local function loadModule(String, Guild)
-	if not moduleExists(String) then return nil, "0:module doesn't exist" end
+	if _G.servers[Guild.id].data.modules[String] == true then return "```Module "..String.." already loaded.```"
+	if not moduleExists(String) then return "```Module "..String.." doesn't exist```" end
 	for k, v in pairs(MDATA.modules[String].commands) do
 		_G.servers[Guild.id].commands[k] = {}
 		_G.servers[Guild.id].commands[k].roles =  {}
@@ -176,7 +177,9 @@ local function loadModule(String, Guild)
 			_G.servers[Guild.id].commands[k].roles[ROOT_USER] = true
 		end
 	end
+	_G.servers[Guild.id].data.modules[String] = true
 	savePermFile(Guild)
+	return "```Module "..String.." loaded.```"
 end
 M.loadModule = loadModule
 

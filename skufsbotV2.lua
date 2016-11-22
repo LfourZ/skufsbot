@@ -65,6 +65,9 @@ client:on("messageCreate", function(message)
 						message.channel:sendMessage(perm.listCommands(message.guild))
 					end
 					-------
+				elseif cmd == "module" then
+					if arg == nil then return end
+					message.channel:sendMessage(perm.loadModule(arg, message.guild))
 				end
 
 				--Put commands here

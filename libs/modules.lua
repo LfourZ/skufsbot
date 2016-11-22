@@ -21,6 +21,10 @@ M.modules = {
 			whocanuse = {
 				info = nil,
 				usage = nil
+			},
+			module = {
+				info = nil,
+				usage = nil
 			}
 		},
 		version = 0.1
