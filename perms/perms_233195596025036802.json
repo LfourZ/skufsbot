@@ -1,35 +1,8 @@
 {
   "data":{
     "modules":{
-      "modules":{
-        "base":{
-          "commands":{
-            "info":{
-              "info":"A test command.",
-              "usage":"!test"
-            },
-            "help":[],
-            "whocanuse":[],
-            "permission":{
-              "info":"Used to add, remove or clear permissions.",
-              "usage":"!permission<add/remove/clear> <command name> <mentions (@user, @role, #channel)>\n\nAdding an user gives the user complete authority, even if their channel and role are blacklisted.\nSimilarly, blacklisting a user bans them entirely from using the command.\nFor a user to use a command, their role must allow it, and the channel must too.\n(if no specific rule is applied to the channel, it defaults to allowing the command)"
-            },
-            "usage":[]
-          },
-          "version":0.1
-        },
-        "debug":{
-          "commands":{
-            "printelement":[],
-            "test":{
-              "info":"A test command.",
-              "usage":"!test"
-            },
-            "setdata":[]
-          },
-          "version":0.1
-        }
-      }
+      "base":true,
+      "debug":false
     },
     "msgsettings":3,
     "loudchar":"!",
@@ -40,46 +13,7 @@
     "silentchar":"/"
   },
   "commands":{
-    "whocanuse":{
-      "channels":{
-        "placeholder":false
-      },
-      "roles":{
-        "placeholder":false,
-        "184262286058323968":true
-      },
-      "users":{
-        "placeholder":false,
-        "225536026293043200":true
-      }
-    },
-    "permission":{
-      "channels":{
-        "placeholder":false
-      },
-      "roles":{
-        "placeholder":false,
-        "184262286058323968":true
-      },
-      "users":{
-        "placeholder":false,
-        "225536026293043200":true
-      }
-    },
-    "printelement":{
-      "channels":{
-        "placeholder":false
-      },
-      "roles":{
-        "placeholder":false,
-        "184262286058323968":true
-      },
-      "users":{
-        "placeholder":false,
-        "225536026293043200":true
-      }
-    },
-    "setdata":{
+    "info":{
       "channels":{
         "placeholder":false
       },
@@ -105,33 +39,33 @@
         "225536026293043200":true
       }
     },
-    "info":{
-      "channels":{
-        "placeholder":false
-      },
-      "roles":{
-        "placeholder":false,
-        "184262286058323968":true
-      },
-      "users":{
-        "placeholder":false,
-        "225536026293043200":true
-      }
-    },
-    "test":{
-      "channels":{
-        "placeholder":false
-      },
-      "roles":{
-        "placeholder":false,
-        "184262286058323968":true
-      },
-      "users":{
-        "placeholder":false,
-        "225536026293043200":true
-      }
-    },
     "usage":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "225536026293043200":true
+      }
+    },
+    "permission":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "225536026293043200":true
+      }
+    },
+    "whocanuse":{
       "channels":{
         "placeholder":false
       },

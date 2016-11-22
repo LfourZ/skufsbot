@@ -4,7 +4,11 @@ local M = {}
 local ltable = require("./ltable") --For a few table functions
 local httpfunctions = require("./httpFunctions") --For http functions and xml to table
 local json = require("./json")
-local modules = require("./modules")
+local mdata = require("./modules")
+
+local MDATA = {
+	modules = mdata.modules
+}
 
 --Users, roles and channels that get instant thumbs up for new commands
 local ROOT_ROLE = nil
@@ -155,41 +159,58 @@ local function fileExists(Name) --DONE
 end
 M.fileExists = fileExists
 
---Creates table structure and default entries for a server, used for instance when new server is detected
-local function generatePermTable(Guild, Table)
-	ldebug("Running function "..debug.getinfo(1, "n").name)
-	local tbl = {}
-	tbl["data"] = {}
-	tbl.data["silentchar"] = "/"
-	tbl.data["loudchar"] = "!"
-	tbl.data["servername"] = Guild.name
-	tbl.data["joinmsg"] = "User has joined the server"
-	tbl.data["leavemsg"] = "User has left the server"
-	tbl.data["msgchannel"] = Guild.defaultChannel.id
-	tbl.data["msgsettings"] = 3
-	tbl.data["modules"] = modules.data
-	tbl["commands"] = {}
-	for k, v in pairs(Table) do
-		tbl.commands[k] = {}
-		tbl.commands[k].roles =  {}
-		tbl.commands[k].roles["placeholder"] = false
+local function moduleExists(String)
+	if MDATA.modules[String] then
+		return true
+	else
+		return false
+	end
+end
+M.moduleExists = moduleExists
+
+local function loadModule(String, Guild)
+	if not moduleExists(String) then return nil, "0:module doesn't exist" end
+	for k, v in pairs(MDATA.modules[String].commands) do
+		_G.servers[Guild.id].commands[k] = {}
+		_G.servers[Guild.id].commands[k].roles =  {}
+		_G.servers[Guild.id].commands[k].roles["placeholder"] = false
 		if ROOT_ROLE ~= nil then
-			tbl.commands[k].roles[ROOT_ROLE] = true
+			_G.servers[Guild.id].commands[k].roles[ROOT_ROLE] = true
 		end
-		tbl.commands[k].channels = {}
-		tbl.commands[k].channels["placeholder"] = false
+		_G.servers[Guild.id].commands[k].channels = {}
+		_G.servers[Guild.id].commands[k].channels["placeholder"] = false
 		if ROOT_CHANNEL ~= nil then
-			tbl.commands[k].roles[ROOT_CHANNEL] = true
+			_G.servers[Guild.id].commands[k].roles[ROOT_CHANNEL] = true
 		end
-		tbl.commands[k].users = {}
-		tbl.commands[k].users["placeholder"] = false
-		tbl.commands[k].users[Guild.owner.id] = true
+		_G.servers[Guild.id].commands[k].users = {}
+		_G.servers[Guild.id].commands[k].users["placeholder"] = false
+		_G.servers[Guild.id].commands[k].users[Guild.owner.id] = true
 		if ROOT_USER ~= nil then
-			tbl.commands[k].roles[ROOT_USER] = true
+			_G.servers[Guild.id].commands[k].roles[ROOT_USER] = true
 		end
 	end
-	_G.servers[Guild.id] = tbl
 	savePermFile(Guild)
+end
+M.loadModule = loadModule
+
+--Creates table structure and default entries for a server, used for instance when new server is detected
+local function generatePermTable(Guild)
+	ldebug("Running function "..debug.getinfo(1, "n").name)
+	_G.servers[Guild.id] = {}
+	_G.servers[Guild.id]["data"] = {}
+	_G.servers[Guild.id].data["silentchar"] = "/"
+	_G.servers[Guild.id].data["loudchar"] = "!"
+	_G.servers[Guild.id].data["servername"] = Guild.name
+	_G.servers[Guild.id].data["joinmsg"] = "User has joined the server"
+	_G.servers[Guild.id].data["leavemsg"] = "User has left the server"
+	_G.servers[Guild.id].data["msgchannel"] = Guild.defaultChannel.id
+	_G.servers[Guild.id].data["msgsettings"] = 3
+	_G.servers[Guild.id].data["modules"] = {
+		base = true,
+		debug = false
+	}
+	_G.servers[Guild.id]["commands"] = {}
+	loadModule("base", Guild)
 end
 M.generatePermTable = generatePermTable
 
@@ -233,12 +254,12 @@ end
 M.loadPermFile = loadPermFile
 
 --Checks if Command exists on Server. If not, checks if Command is a default command, and if so, loads it
-local function commandExists(Cmd, Guild)
+local function commandLoaded(Cmd, Guild)
 	local returnval = false
-	if type(_G.servers[Guild.id].commands[Cmd]) ~= "nil" then
+	if _G.servers[Guild.id].commands[Cmd] then
 		returnval = true
 	else
-		if type(_G.defcommands[Cmd]) ~= "nil" then
+		if commandExists(Cmd) then
 			addCommand(Cmd, Guild)
 			returnval = true
 		else
@@ -248,7 +269,20 @@ local function commandExists(Cmd, Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name..":"..tostring(returnval))
 	return returnval
 end
+M.commandLoaded = commandLoaded
+
+local function commandExists(Command)
+	local found = false
+	for mod, table in pairs(MDATA.modules) do
+		if table.commands[Command] then
+			found =  true
+			break
+		end
+	end
+	return found
+end
 M.commandExists = commandExists
+
 
 --Checks for permission JSON file for ALL servers, when server without file is found, generates server file with default commands
 local function checkForPermFile(Client)
@@ -366,7 +400,7 @@ M.canUse = canUse
 local function editPerms(Message, Args, Guild)
 	ldebug("Running function "..debug.getinfo(1, "n").name)
 	local action, commande = string.match(Args, "(%S+) (%S+)")
-	if not commandExists(commande, Guild) then print("Command "..commande.." doesn't exist.") return end
+	if not commandExists(commande) then print("Command "..commande.." doesn't exist.") return end
 	local str = "```\n"
 	str = str.."Action "..action.." applied to command "..commande.." with members:\n"
 	if action == "add" then
@@ -402,7 +436,7 @@ local function whoCanUse(Command, Guild, Client)
 	print(Command)
 	local str = "```\n"
 	local allowed = ""
-	if commandExists(Command, Guild) == false then return end
+	if commandLoaded(Command, Guild) == false then return end
 	str = str.."Members who can/cannot use command "..Command..":\n"
 	if type(_G.servers[Guild.id].commands[Command].users) == "table" then
 		for k, v in pairs(_G.servers[Guild.id].commands[Command].users) do
@@ -460,9 +494,9 @@ end
 M.whoCanUse = whoCanUse
 
 --Returns info associated with command
-local function cmdinfo(Cmd, Guild)
+local function cmdinfo(Cmd)
 	local returnval = "```\n"
-	if not commandExists(Cmd, Guild) then
+	if not commandExists(Cmd) then
 		returnval = nil
 	elseif type(_G.defcommands[Cmd].info) ~= "string" then
 		returnval = returnval.."This command has no info attached to it yet"
@@ -475,9 +509,9 @@ end
 M.cmdinfo = cmdinfo
 
 --Returns usage associated with command
-local function cmdusage(Cmd, Guild)
+local function cmdusage(Cmd)
 	local returnval = "```\n"
-	if not commandExists(Cmd, Guild) then
+	if not commandExists(Cmd) then
 		returnval = nil
 	elseif type(_G.defcommands[Cmd].usage) ~= "string" then
 		returnval = returnval.."This command has no usage info attached to it yet"
@@ -490,16 +524,16 @@ end
 M.cmdusage = cmdusage
 
 --Returns info and usage associated with command
-local function cmdhelp(Cmd, Guild)
+local function cmdhelp(Cmd)
 	local returnval = ""
 	if Cmd == nil then
 		returnval = "```Commandlist not yet implemented```"
 	else
-		if not commandExists(Cmd, Guild) then
+		if not commandExists(Cmd) then
 			returnval = "```\nCommand '"..Cmd.."' doesn't exist.\n```"
 		else
-			returnval = returnval..cmdinfo(Cmd, Guild).."\n"
-			returnval = returnval..cmdusage(Cmd, Guild)
+			returnval = returnval..cmdinfo(Cmd).."\n"
+			returnval = returnval..cmdusage(Cmd)
 		end
 	end
 	return returnval
@@ -516,5 +550,7 @@ local function listCommands(Guild)
 	return str
 end
 M.listCommands = listCommands
+
+
 
 return M
