@@ -1,16 +1,16 @@
 {
   "data":{
+    "leavemsg":"User has left the server",
     "silentchar":"/",
+    "msgsettings":3,
     "loudchar":"!",
+    "msgchannel":"184264120982306817",
     "joinmsg":"User has joined the server",
+    "servername":"Honest men",
     "modules":{
       "base":true,
-      "debug":false
-    },
-    "msgchannel":"184264120982306817",
-    "msgsettings":3,
-    "servername":"Honest men",
-    "leavemsg":"User has left the server"
+      "debug":true
+    }
   },
   "commands":{
     "info":{
@@ -26,7 +26,7 @@
         "184262286058323968":true
       }
     },
-    "permission":{
+    "setdata":{
       "channels":{
         "placeholder":false
       },
@@ -52,6 +52,19 @@
         "184262286058323968":true
       }
     },
+    "test":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "184262286058323968":true
+      }
+    },
     "whocanuse":{
       "channels":{
         "placeholder":false
@@ -65,10 +78,68 @@
         "184262286058323968":true
       }
     },
-    "test":{
-      "channels":[],
-      "roles":[],
+    "load":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
       "users":{
+        "placeholder":false,
+        "184262286058323968":true
+      }
+    },
+    "printelement":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "184262286058323968":true
+      }
+    },
+    "listmodules":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "184262286058323968":true
+      }
+    },
+    "permission":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "184262286058323968":true
+      }
+    },
+    "unload":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
         "184262286058323968":true
       }
     },

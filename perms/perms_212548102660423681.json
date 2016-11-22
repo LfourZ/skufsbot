@@ -13,7 +13,46 @@
     "silentchar":"/"
   },
   "commands":{
+    "usage":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "124243691123638274":true
+      }
+    },
+    "load":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "124243691123638274":true
+      }
+    },
     "info":{
+      "channels":{
+        "placeholder":false
+      },
+      "roles":{
+        "placeholder":false,
+        "184262286058323968":true
+      },
+      "users":{
+        "placeholder":false,
+        "124243691123638274":true
+      }
+    },
+    "listmodules":{
       "channels":{
         "placeholder":false
       },
@@ -39,7 +78,7 @@
         "124243691123638274":true
       }
     },
-    "usage":{
+    "permission":{
       "channels":{
         "placeholder":false
       },
@@ -52,7 +91,7 @@
         "124243691123638274":true
       }
     },
-    "permission":{
+    "unload":{
       "channels":{
         "placeholder":false
       },

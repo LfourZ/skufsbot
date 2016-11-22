@@ -29,7 +29,8 @@ _G.events["leave"] = bit.arshift(1, -1)
 --Better debug thing, will redo in the future
 local function ldebug(String)
 	if not DEBUG then return end
-	print(string.format("[%s]: %s", os.date("%c"), String))
+	print(debug.traceback())
+	--print(string.format("[%s]: %s on line %s", os.date("%c"), String, debug.getinfo(1).currentline))
 end
 
 --Announcements
@@ -59,7 +60,7 @@ M.announcement = announcement
 
 --Prints data found in path Message seperated by whitespaces.
 local function printElement(String, Message)
-	local str = string.gsub(String, "Server.id", Message.server.id)
+	local str = string.gsub(String, "Server.id", Message.guild.id)
 	str = string.gsub(str, "Me.id", Message.author.id)
 	local path = _G
 	local returnstr = "```\n"
@@ -97,12 +98,12 @@ M.savePermFile = savePermFile
 
 --Sets values in the server specific data directory
 local function setData(String, Message)
-	local str = string.gsub(String, "Server.id", Message.server.id)
-	str = string.gsub(str, "Me.id", Message.author.id)
+	local str = string.gsub(String, "Server.id", Message.guild.id)
+	str = string.gsub(str, "Me.id", Message.member.id)
 	local key, value = string.match(str, "(%S+) (.*)")
 	if key == nil then return end
-	_G.servers[Message.server.id].data[key] = value
-	savePermFile(Message.server)
+	_G.servers[Message.guild.id].data[key] = value
+	savePermFile(Message.guild)
 end
 M.setData = setData
 
@@ -156,7 +157,9 @@ end
 M.moduleExists = moduleExists
 
 local function loadModule(String, Guild)
-	if _G.servers[Guild.id].data.modules[String] == true then return "```Module "..String.." already loaded.```"
+	if String ~= "base" then
+		if _G.servers[Guild.id].data.modules[String] == true then return "```Module "..String.." already loaded.```" end
+	end
 	if not moduleExists(String) then return "```Module "..String.." doesn't exist```" end
 	for k, v in pairs(MDATA.modules[String].commands) do
 		_G.servers[Guild.id].commands[k] = {}
@@ -182,6 +185,28 @@ local function loadModule(String, Guild)
 	return "```Module "..String.." loaded.```"
 end
 M.loadModule = loadModule
+
+local function unloadModule(String, Guild)
+	if _G.servers[Guild.id].data.modules[String] == false then return "```Module "..String.." already unloaded.```" end
+	if not moduleExists(String) then return "```Module "..String.." doesn't exist```" end
+	for k, v in pairs(MDATA.modules[String].commands) do
+		_G.servers[Guild.id].commands[k] = nil
+	end
+	_G.servers[Guild.id].data.modules[String] = false
+	savePermFile(Guild)
+	return "```Module "..String.." unloaded.```"
+end
+M.unloadModule = unloadModule
+
+local function listModules(Guild)
+	local returnval = "```\n"
+	for k, v in pairs(_G.servers[Guild.id].data.modules) do
+		returnval = returnval..k.."   "..tostring(v).."\n"
+	end
+	returnval = returnval.."```"
+	return returnval
+end
+M.listModules = listModules
 
 --Creates table structure and default entries for a server, used for instance when new server is detected
 local function generatePermTable(Guild)
@@ -353,14 +378,14 @@ end
 M.crossCheckElement = crossCheckElement
 
 --Checks if the user has a permitted role for a command, if nothing is found, defaults to false
-local function roleAllowed(User, Command)
-	return crossCheckKey(User.roles, _G.servers[User.guild.id].commands[Command].roles, false, User.guild)
+local function roleAllowed(Member, Command)
+	return crossCheckKey(Member.roles, _G.servers[Member.guild.id].commands[Command].roles, false, Member.guild)
 end
 M.roleAllowed = roleAllowed
 
 --Checks if exception exists for the user and command, if nothing is found, defaults to nil
-local function userAllowed(User, Command)
-	return checkForPerm(_G.servers[User.guild.id].commands[Command].users, User.id, nil)
+local function userAllowed(Member, Command)
+	return checkForPerm(_G.servers[Member.guild.id].commands[Command].users, Member.id, nil)
 end
 M.userAllowed = userAllowed
 
@@ -428,6 +453,9 @@ local function whoCanUse(Command, Guild, Client)
 	print(Command)
 	local str = "```\n"
 	local allowed = ""
+	local found, modName = commandExists(Command)
+	if not found then return end
+	if not moduleActive(modName, Guild) then return end
 	if commandLoaded(Command, Guild) == false then return end
 	str = str.."Members who can/cannot use command "..Command..":\n"
 	if type(_G.servers[Guild.id].commands[Command].users) == "table" then
@@ -488,7 +516,7 @@ M.whoCanUse = whoCanUse
 --Returns info associated with command
 local function cmdinfo(Cmd)
 	local returnval = "```\n"
-	local found modName = commandExists(Cmd)
+	local found, modName = commandExists(Cmd)
 	if not found then
 		returnval = nil
 	elseif type(MDATA.modules[modName].commands[Cmd].info) ~= "string" then
@@ -496,6 +524,7 @@ local function cmdinfo(Cmd)
 	else
 		returnval = returnval..MDATA.modules[modName].commands[Cmd].info
 	end
+	if returnval == nil then return end
 	returnval = returnval.."```"
 	return returnval
 end

@@ -22,7 +22,15 @@ M.modules = {
 				info = nil,
 				usage = nil
 			},
-			module = {
+			load = {
+				info = nil,
+				usage = nil
+			},
+			unload = {
+				info = nil,
+				usage = nil
+			},
+			listmodules = {
 				info = nil,
 				usage = nil
 			}

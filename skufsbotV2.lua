@@ -23,7 +23,7 @@ client:on("messageCreate", function(message)
 	cmd = string.lower(string.sub(cmd, 2))
 	local found, moduleName = perm.commandExists(cmd, message.guild)
 	if found then
-		if not perm.moduleActive(moduleName) then return end
+		if not perm.moduleActive(moduleName, message.guild) then return end
 		if perm.canUse(message, cmd) then
 			if perm.isSilent(firstChar, message.guild) ~= nil then
 				delete = perm.isSilent(firstChar, message.guild)
@@ -52,7 +52,10 @@ client:on("messageCreate", function(message)
 					-------
 				elseif cmd == "info" then
 					if arg == nil then return end
-					message.channel:sendMessage(perm.cmdinfo(arg, message.guild))
+					local returnval = perm.cmdinfo(arg, message.guild)
+					if returnval then
+						message.channel:sendMessage(returnval)
+					end
 					-------
 				elseif cmd == "usage" then
 					if arg == nil then return end
@@ -65,9 +68,16 @@ client:on("messageCreate", function(message)
 						message.channel:sendMessage(perm.listCommands(message.guild))
 					end
 					-------
-				elseif cmd == "module" then
+				elseif cmd == "load" then
 					if arg == nil then return end
 					message.channel:sendMessage(perm.loadModule(arg, message.guild))
+					-------
+				elseif cmd == "unload" then
+					if arg == nil then return end
+					message.channel:sendMessage(perm.unloadModule(arg, message.guild))
+					-------
+				elseif cmd == "listmodules" then
+					message.channel:sendMessage(perm.listModules(message.guild))
 				end
 
 				--Put commands here
