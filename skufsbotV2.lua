@@ -21,7 +21,9 @@ client:on("messageCreate", function(message)
 	local firstChar = string.sub(cmd, 1, 1)
 	local delete = false
 	cmd = string.lower(string.sub(cmd, 2))
-	if perm.commandExists(cmd, message.guild) then
+	local found, moduleName = perm.commandExists(cmd, message.guild)
+	if found then
+		if not perm.moduleActive(moduleName) then return end
 		if perm.canUse(message, cmd) then
 			if perm.isSilent(firstChar, message.guild) ~= nil then
 				delete = perm.isSilent(firstChar, message.guild)
