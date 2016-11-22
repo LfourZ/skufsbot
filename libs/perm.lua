@@ -488,10 +488,10 @@ local function cmdinfo(Cmd)
 	local found modName = commandExists(Cmd)
 	if not found then
 		returnval = nil
-	elseif type(MDATA.modules[modName][Cmd].info) ~= "string" then
+	elseif type(MDATA.modules[modName].commands[Cmd].info) ~= "string" then
 		returnval = returnval.."This command has no info attached to it yet"
 	else
-		returnval = returnval..MDATA.modules[modName][Cmd].info
+		returnval = returnval..MDATA.modules[modName].commands[Cmd].info
 	end
 	returnval = returnval.."```"
 	return returnval
@@ -504,10 +504,10 @@ local function cmdusage(Cmd)
 	local found, modName = commandExists(Cmd)
 	if not found then
 		returnval = nil
-	elseif type(MDATA.modules[modName][Cmd].usage) ~= "string" then
+	elseif type(MDATA.modules[modName].commands[Cmd].usage) ~= "string" then
 		returnval = returnval.."This command has no usage info attached to it yet"
 	else
-		returnval = returnval..MDATA.modules[modName][Cmd].usage
+		returnval = returnval..MDATA.modules[modName].commands[Cmd].usage
 	end
 	returnval = returnval.."```"
 	return returnval
@@ -536,8 +536,9 @@ local function listCommands(Guild)
 	local str = "```\n"
 	for k, v in pairs(_G.servers[Guild.id].data.modules) do
 		if v then
-			for command, _ in pairs(MDATA.modules[k].commands)
-			str = str.._G.servers[Guild.id].data.loudchar..command.."\n"
+			for command, _ in pairs(MDATA.modules[k].commands) do
+				str = str.._G.servers[Guild.id].data.loudchar..command.."\n"
+			end
 		end
 	end
 	str = str.."```"
